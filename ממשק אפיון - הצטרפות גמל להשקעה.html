@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>אפיון הדרישה — הצטרפות לקופת גמל להשקעה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Heebo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0A1F44; --blue:#3C65E3; --blue-soft:#EEF2FE; --green:#1E9E6A; --green-soft:#E7F6EF;
+    --amber:#B5730A; --amber-soft:#FFF4E0; --purple:#6B3FB5; --purple-soft:#F1EBFB;
+    --gray:#5B6470; --line:#E2E6EE; --bg:#F4F6FA; --card:#FFFFFF; --rose:#B3261E; --rose-soft:#FDECEA;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:"Assistant","Heebo","Segoe UI",Arial,sans-serif; margin:0; background:var(--bg); color:var(--navy); line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1100px; margin:0 auto; padding:24px 20px 70px;}
+  header.hero{background:linear-gradient(135deg,var(--navy) 0%,#16315f 60%,var(--blue) 130%); color:#fff; border-radius:18px; padding:28px 30px; box-shadow:0 12px 30px rgba(10,31,68,.18);}
+  header.hero .kicker{font-size:13px; letter-spacing:.04em; opacity:.85; font-weight:700;}
+  header.hero h1{margin:8px 0 6px; font-size:27px; line-height:1.25;}
+  header.hero p{margin:0; font-size:16px; opacity:.93; max-width:820px;}
+  .hmeta{display:flex; flex-wrap:wrap; gap:8px 22px; margin-top:14px; font-size:13px; opacity:.92;}
+  .hmeta b{font-weight:700;}
+
+  /* tabs */
+  .tabs{display:flex; flex-wrap:wrap; gap:8px; position:sticky; top:0; z-index:20; background:var(--bg); padding:14px 0 10px; margin-top:10px; border-bottom:1px solid var(--line);}
+  .tab{display:flex; align-items:center; gap:7px; cursor:pointer; border:1px solid var(--line); background:var(--card); color:var(--navy); padding:9px 15px; border-radius:11px; font-size:14.5px; font-weight:700; font-family:inherit; transition:.15s; box-shadow:0 1px 3px rgba(10,31,68,.05);}
+  .tab:hover{border-color:var(--blue); color:var(--blue);}
+  .tab.active{background:var(--navy); color:#fff; border-color:var(--navy);}
+  .tab .num{font-size:11px; opacity:.6; font-weight:700;}
+  .tab.active .num{opacity:.8;}
+
+  .panel{display:none; animation:fade .25s ease;}
+  .panel.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  .ptitle{font-size:22px; margin:22px 0 2px; display:flex; align-items:center; gap:10px;}
+  .ppurpose{color:var(--gray); font-size:15px; margin:0 0 14px;}
+  h3.sub{font-size:17.5px; margin:26px 0 8px; padding-bottom:7px; border-bottom:2px solid var(--blue-soft);}
+  h4.grp{font-size:15.5px; margin:18px 0 8px; color:var(--navy); background:var(--blue-soft); display:inline-block; padding:4px 12px; border-radius:8px;}
+  p{margin:9px 0;} .lead{font-size:16px;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin:12px 0; box-shadow:0 2px 8px rgba(10,31,68,.04);}
+
+  /* chips */
+  .chip{display:inline-block; font-size:11.5px; font-weight:800; padding:2px 9px; border-radius:999px; white-space:nowrap; line-height:1.6;}
+  .c-red{background:var(--rose-soft); color:var(--rose); border:1px solid #f3c9c4;}
+  .c-yellow{background:var(--amber-soft); color:var(--amber); border:1px solid #f0d9a8;}
+  .c-purple{background:var(--purple-soft); color:var(--purple); border:1px solid #ddccf3;}
+  .c-green{background:var(--green-soft); color:var(--green); border:1px solid #b9e6cf;}
+  .c-blue{background:var(--blue-soft); color:var(--blue); border:1px solid #cdd9fb;}
+  .c-gray{background:#EEF1F5; color:var(--gray); border:1px solid #dfe4ea;}
+
+  table{width:100%; border-collapse:collapse; margin:12px 0 6px; background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden; font-size:13.8px;}
+  thead th{background:var(--navy); color:#fff; text-align:right; padding:10px 12px; font-weight:700; font-size:13px;}
+  tbody td{padding:9px 12px; border-top:1px solid var(--line); vertical-align:top;}
+  tbody tr:nth-child(even){background:#FAFBFD;}
+  td .lbl{font-weight:700; display:block;}
+  .tbl-scroll{overflow-x:auto;}
+
+  .callout{border-radius:12px; padding:12px 15px; margin:12px 0; font-size:14px; border-right:5px solid var(--blue); background:var(--blue-soft);}
+  .callout.warn{border-right-color:var(--amber); background:var(--amber-soft);}
+  .callout.risk{border-right-color:var(--rose); background:var(--rose-soft);}
+  .callout.ok{border-right-color:var(--green); background:var(--green-soft);}
+  .callout .ttl{display:block; font-weight:800; margin-bottom:3px;}
+
+  ul.clean{margin:8px 0; padding-inline-start:20px;} ul.clean li{margin:5px 0;}
+  .steps{counter-reset:s; list-style:none; padding:0; margin:10px 0;}
+  .steps>li{position:relative; padding:12px 52px 12px 16px; background:var(--card); border:1px solid var(--line); border-radius:12px; margin:8px 0;}
+  .steps>li:before{counter-increment:s; content:counter(s); position:absolute; right:14px; top:12px; width:28px; height:28px; background:var(--blue); color:#fff; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:14px;}
+  .steps>li b{color:var(--navy);}
+
+  /* question item */
+  .q{display:flex; gap:10px; padding:11px 14px; border:1px solid var(--line); border-radius:11px; margin:7px 0; background:var(--card); align-items:flex-start;}
+  .q .qid{font-weight:800; color:var(--navy); white-space:nowrap; font-size:13.5px;}
+  .q .qbody{font-size:14px;}
+  .q .qsrc{color:var(--gray); font-size:12.5px; display:block; margin-top:3px;}
+  .q.red{border-right:4px solid var(--rose);}
+  .q.yellow{border-right:4px solid var(--amber);}
+  .q.purple{border-right:4px solid var(--purple);}
+  .q.done{border-right:4px solid var(--green); opacity:.85;}
+
+  .filterbar{display:flex; flex-wrap:wrap; gap:7px; margin:10px 0 4px;}
+  .fbtn{cursor:pointer; border:1px solid var(--line); background:var(--card); padding:6px 13px; border-radius:999px; font-size:13px; font-weight:700; font-family:inherit; color:var(--navy);}
+  .fbtn.active{background:var(--blue); color:#fff; border-color:var(--blue);}
+
+  .pill-row{display:flex; flex-wrap:wrap; gap:7px; margin:8px 0;}
+  .pill{background:var(--blue-soft); color:var(--blue); border:1px solid #cdd9fb; border-radius:999px; padding:4px 12px; font-size:13px; font-weight:700;}
+  .pill.new{background:var(--green-soft); color:var(--green); border-color:#b9e6cf;}
+  .legend{display:flex; flex-wrap:wrap; gap:8px 16px; align-items:center; font-size:12.5px; color:var(--gray); background:var(--card); border:1px dashed var(--line); border-radius:10px; padding:9px 13px; margin:12px 0;}
+  .arrow-flow{display:flex; flex-wrap:wrap; align-items:center; gap:6px; font-weight:700; font-size:14px; margin:10px 0;}
+  .arrow-flow .box{background:var(--card); border:1px solid var(--line); border-radius:9px; padding:7px 12px;}
+  .arrow-flow .ar{color:var(--blue); font-weight:800;}
+  footer{margin-top:40px; padding-top:16px; border-top:1px solid var(--line); color:var(--gray); font-size:12.5px;}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:12px;} @media(max-width:780px){.two{grid-template-columns:1fr;} .ptitle{font-size:19px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="kicker">מגדל דיגיטל · בנקאות פתוחה · פיילוט SDD</div>
+    <h1>אפיון הדרישה — הצטרפות לקופת גמל להשקעה</h1>
+    <p>ממשק מרוכז לכל חבילת האפיון: הסבר הדרישה, הנחות יסוד, שאלות פתוחות, מטריצת לקוח, ומבנה ה-PRD/SDD. כל טאב = קובץ אחד.</p>
+    <div class="hmeta">
+      <span><b>הוכן ע"י:</b> שכבת ה-AI-PM (תום)</span>
+      <span><b>קהל:</b> תום · מאיה · צוות הדיגיטל</span>
+      <span><b>עודכן:</b> יוני 2026</span>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab active" onclick="showTab(0)"><span class="num">00</span> 📍 ניווט וסקירה</button>
+    <button class="tab" onclick="showTab(1)"><span class="num">01</span> 📖 הסבר הדרישה</button>
+    <button class="tab" onclick="showTab(2)"><span class="num">02</span> 🧱 הנחות יסוד</button>
+    <button class="tab" onclick="showTab(3)"><span class="num">03</span> ❓ שאלות פתוחות</button>
+    <button class="tab" onclick="showTab(4)"><span class="num">04</span> 🧮 מטריצת לקוח</button>
+    <button class="tab" onclick="showTab(5)"><span class="num">05</span> 🗺️ מבנה · PRD/SDD</button>
+    <button class="tab" onclick="showTab(6)"><span class="num">06</span> 🧩 Stories &amp; Specs</button>
+  </nav>
+
+  <main>
+
+  <!-- ===================== TAB 0 — NAV ===================== -->
+  <section class="panel active" id="t0">
+    <div class="ptitle">📍 מפת ניווט וסקירה</div>
+    <p class="ppurpose">מה יש בחבילה, החלטות התכולה שאושרו, ואיפה אנחנו בתהליך.</p>
+
+    <div class="card lead">
+      התהליך עובר עיצוב-מחדש: מ<b>"טופס ארוך עם הרבה הקלדה"</b> (3 שלבים) ל<b>תהליך מבוסס-זהות ומבוסס-נתונים</b> (5 שלבים + סיכום + הצלחה). זה גם <b>הפיילוט הראשון של מגדל ל-SDD</b>. מטרת-העל: הפחתת ריג'קטים ועבודה ידנית בתפעול (+ שיפור Conversion).
+    </div>
+
+    <h3 class="sub">סדר קריאה מומלץ</h3>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>טאב</th><th>מה תמצאו</th><th>מתי</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">01 · הסבר הדרישה</td><td>פירוק התהליך בשפה פשוטה — מה נדרש ולמה</td><td>כדי <b>להבין</b></td></tr>
+        <tr><td class="lbl">02 · הנחות יסוד</td><td>מה לקחת כנתון לפני כתיבת הדרישה (עסקי+טכני)</td><td>לפני PRD</td></tr>
+        <tr><td class="lbl">03 · שאלות פתוחות</td><td>כל השאלות לפי קבוצות ועדיפות — דלק לפגישת פערים</td><td>להצפה מול הצוות</td></tr>
+        <tr><td class="lbl">04 · מטריצת לקוח</td><td>מה כל סוג לקוח מספק מול מה שכבר יש לנו</td><td>בזמן אפיון שדות</td></tr>
+        <tr><td class="lbl">05 · מבנה · PRD/SDD</td><td>אפיק→אזורים→Stories→Specs + לוג החלטות</td><td>כשמתחילים לכתוב</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">✅ החלטות תכולה שאושרו</h3>
+    <ul class="clean">
+      <li><b>תוצר:</b> קודם PRD בטמפלייט מגדל → אחר כך SDD (Constitution + Specs).</li>
+      <li><b>גישה:</b> מאפיינים את כל החזון, מתייגים <span class="chip c-purple">שלב ב'</span> במפורש.</li>
+      <li><b>ערוצים כעת:</b> אתר שיווקי · אזור אישי · אפליקציה. <span class="chip c-gray">לא כעת:</span> לינק סוכן · IVR/SMS · CRM.</li>
+      <li><b>פלטפורמות:</b> דסקטופ + מובייל.</li>
+      <li><b>סוגי לקוח:</b> חדש · מוכר ללא גמל"ש · קיים עם גמל"ש · קטין · הפקדה-לקיים (→LPS, מחוץ לתכולה).</li>
+      <li><b>מבנה:</b> אפיק יחיד → אזורי-יכולת → User Stories → Spec לכל story עסקי + shared-specs.</li>
+    </ul>
+
+    <h3 class="sub">איפה אנחנו</h3>
+    <div class="arrow-flow">
+      <span class="box" style="border-color:var(--green); background:var(--green-soft);">✓ איסוף וקריאת כל הקונטקסט</span><span class="ar">←</span>
+      <span class="box" style="border-color:var(--green); background:var(--green-soft);">✓ זיהוי פערים והנחות</span><span class="ar">←</span>
+      <span class="box" style="border-color:var(--blue); background:var(--blue-soft);">► review של תום</span><span class="ar">←</span>
+      <span class="box">הצפת שאלות לצוות</span><span class="ar">←</span>
+      <span class="box">כתיבת PRD</span><span class="ar">←</span>
+      <span class="box">SDD</span>
+    </div>
+
+    <div class="legend"><b style="color:var(--navy)">מקרא:</b>
+      <span><span class="chip c-red">חוסם</span> חייב הכרעה</span>
+      <span><span class="chip c-yellow">פתוח</span> לא חוסם</span>
+      <span><span class="chip c-purple">שלב ב'</span> דחוי</span>
+      <span><span class="chip c-green">נסגר</span> הוכרע</span>
+    </div>
+  </section>
+
+  <!-- ===================== TAB 1 — EXPLAINER ===================== -->
+  <section class="panel" id="t1">
+    <div class="ptitle">📖 הסבר הדרישה</div>
+    <p class="ppurpose">מה התהליך עושה, למה כל חלק קיים, ומה ההשלכה על האפיון.</p>
+
+    <h3 class="sub">1 · השינוי הגדול במשפט אחד</h3>
+    <p>מעבר מ<b>"טופס ארוך עם הקלדה ידנית"</b> ל<b>"זיהוי-תחילה, מבוסס-נתונים"</b>. <b>מטרת-העל:</b> הפחתת ריג'קטים ועבודה ידנית בתפעול (+ Conversion, תוספת תום). <span class="chip c-yellow">חשוב</span> "מסלול ירוק מלא" הוא ה<b>מנגנון</b> (straight-through) שמשיג זאת — לא המטרה, ושאיפה ל-happy path בלבד.</p>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th></th><th>תהליך קיים</th><th>תהליך חדש</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">מבנה</td><td>3 שלבים</td><td>5 שלבים + סיכום + הצלחה</td></tr>
+        <tr><td class="lbl">זיהוי</td><td>אין — מקלידים הכל</td><td>OTP מקדים + (חזון) שליפת משרד הפנים</td></tr>
+        <tr><td class="lbl">ציות</td><td>FATCA/CRS + הצהרה טקסטואלית</td><td>שלב "היכרות פיננסית" מובנה (PEP, מקור כספים)</td></tr>
+        <tr><td class="lbl">תשלום</td><td>הקלדה + הצמדה + מועד חיוב</td><td>מגדל מקימה הו"ק, חתימה דיגיטלית אחת</td></tr>
+        <tr><td class="lbl">מסמכים</td><td>"צירוף קבצים" בתוך הסיום</td><td>שלב העלאה ייעודי (קדמי/אחורי)</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">2 · התהליך שלב-אחר-שלב</h3>
+    <ol class="steps">
+      <li><b>שלב 0 — כניסה, זיהוי ובחירת מסלול.</b> מסך פתיחה → שאלת "לקוח קיים/חדש?" → פרטים מינימליים + OTP → רכזת אישית עם בחירה: הצטרפות חדשה מול <b>הפקדה לקופה קיימת (→ יציאה ל-LPS, מחוץ לתכולה)</b>.</li>
+      <li><b>שלב 1 — פרטים אישיים + משרד הפנים.</b> "עבור מי החיסכון", שליפת שדות מ-MDM ללקוח קיים, תאריך הנפקת ת"ז → אימות מול משרד הפנים, הצהרת תושבות מס. <span class="chip c-yellow">דיוק</span> צילום ת"ז <b>לא</b> כאן — תמיד בשלב 5.</li>
+      <li><b>שלב 2 — סכום ובחירת מסלולים.</b> תדירות + סכום, עם <b>חישוב מול התקרה</b>: האם (חד-פעמי + הו"ק מוקרן לשנה) חורג. לקוח קיים — מנכה הפקדות השנה; חדש — רק מה שמזין. עד 6 מסלולים (סה"כ 100%).</li>
+      <li><b>שלב 3 — היכרות פיננסית (KYC/AML).</b> מופעל רק כשנדרש (בדיקת RAM). שאלון: חו"ל, בעל עסק + תחום, PEP, מקור כספים. חלק מהתשובות → <b>מסלול אדום (הלבנת הון)</b>.</li>
+      <li><b>שלב 4 — חשבון וסוג העברה.</b> "העברה ישירה באמצעות מגדל" (מגדל מקימה הו"ק, חתימה דיגיטלית אחת) מול "העברה בנקאית". מותנה בבנק — רק 5 הגדולים מקבלים מסלול דיגיטלי.</li>
+      <li><b>שלב 5 — העלאת מסמכים.</b> צילום ת"ז קדמי/אחורי + (מותנה) טופס הרשאה לחיוב למי שאינו ב-5 הגדולים.</li>
+      <li><b>סיכום + הצלחה.</b> ריכוז סכומים, צ'קבוקסים, מספר קופה. <span class="chip c-gray">⬜ placeholder</span> במסכים אלה יש טקסט לא-סופי.</li>
+    </ol>
+
+    <h3 class="sub">3 · החוקים החוצים</h3>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>נושא</th><th>מה לדעת</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">תקרה שנתית</td><td>דינמית מהליבה (≈83,641 ₪), פר שנה קלנדרית, מנכה הו"ק עתידית</td></tr>
+        <tr><td class="lbl">RAM / KYC</td><td>בדיקה מאחורי הקלעים לפי ת"ז + סכומים; מחזיר "נדרש/לא" ו"חשוד/לא"</td></tr>
+        <tr><td class="lbl">מסלול אדום (AML)</td><td>תחומי עסק/מקורות כספים מסוימים מפילים מהשקל הראשון → תור עבודה + מייל</td></tr>
+        <tr><td class="lbl">חתימה דיגיטלית</td><td>נקודה אחת בלבד — באישור ההרשאה (הו"ק)</td></tr>
+        <tr><td class="lbl">עורף</td><td>Glikson מייצר XML קיים → סיגל קולטת; ממשק יומי לנוגה 17:00 א'–ה'; תיוק IMAGE</td></tr>
+        <tr><td class="lbl">מספר עמית</td><td>מוקצה בסיום רק במסלול ירוק (לא חשוד)</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">4 · שלוש הסתירות שצריך להחזיק בראש</h3>
+    <div class="callout risk"><span class="ttl">הדרישה הכתובה ≠ ההחלטות בהקראה</span>
+      <b>1. הקמת הו"ק אוטומטית:</b> הדרישה דורשת "מיידית"; ההקראה דחתה לשלב ב'.<br>
+      <b>2. שירות משרד הפנים:</b> הדרישה כליבה; המצגת כ<b>מחליף</b> צילום ת"ז; ההקראה כ"אולי שלב ב'".<br>
+      <b>3. לקוח חשוד:</b> המסמך סותר את עצמו — הכסף מוקם או מוחזק.
+    </div>
+    <p style="font-size:14px; color:var(--gray)">המסקנה: אל תתייחס למסמך הדרישה כמקור אמת יחיד. סתירה = שאלה פתוחה (טאב 03), לא עובדה.</p>
+  </section>
+
+  <!-- ===================== TAB 2 — ASSUMPTIONS ===================== -->
+  <section class="panel" id="t2">
+    <div class="ptitle">🧱 הנחות יסוד</div>
+    <p class="ppurpose">מה להכיר ולקחת כנתון לפני כתיבת הדרישה. <span class="chip c-yellow">לתיקוף</span> = לאמת לפני קיבוע.</p>
+
+    <h4 class="grp">עסקי</h4>
+    <ul class="clean">
+      <li><b>המוצר:</b> קופת גמל להשקעה — חיסכון נזיל, מוטב-מס.</li>
+      <li><b>תקרה שנתית:</b> נקבעת ע"י רשות שוק ההון, <b>דינמית</b> (≈83,641 ₪), פר שנה קלנדרית — קיים בדרישה (שליפה מהליבה, §9).</li>
+      <li><b>מטרת-העל:</b> הפחתת ריג'קטים ועבודה ידנית (+ Conversion, תוספת תום). "מסלול ירוק" = מנגנון, לא מטרה.</li>
+      <li><b>סוגי לקוח:</b> חדש · מוכר ללא גמל"ש · קיים עם גמל"ש · קטין · הפקדה-לקיים (→LPS).</li>
+      <li><b>KYC:</b> נדרש רק מעל <b>70,001 ₪</b>, מצטבר על 4 מוצרי עצמאי (§10.1). <span class="chip c-green">E4 נסגר</span></li>
+      <li><b>מסלול אדום (AML):</b> תחומי עסק ומקורות כספים מסוימים מפילים לטיפול — לעיתים מהשקל הראשון.</li>
+      <li><b>תושבות מס (FATCA/CRS):</b> חובה — בלי הצהרה אין המשך. <b>PEP:</b> שאלת סינון חובה.</li>
+      <li><b>5 הבנקים הגדולים:</b> מסלול הו"ק דיגיטלי <span class="chip c-yellow">לוודא שקיים — T-6</span>; לשאר — העברה ידנית + העלאת טופס.</li>
+      <li><b>חתימה גרפית רק במסלול 5 הבנקים הגדולים</b> (הקמת הו"ק אוטומטית) — באישור ההרשאה. שאר ההצהרות = צ'קבוקסים.</li>
+      <li><b>O.F (Open Finance) הוסר</b> מהתהליך (הסיבה — לבירור).</li>
+      <li><b>מספר עמית</b> מוקצה בסיום רק במסלול ירוק.</li>
+      <li><span class="chip c-purple">שלב ב'</span> הקמת הו"ק אוטומטית · לינק סוכן · מסך סיכום עם גרף · הו"ק חד-פעמי. <b>משרד הפנים — עדיין בדין ודברים.</b></li>
+    </ul>
+
+    <h4 class="grp">טכני</h4>
+    <ul class="clean">
+      <li><b>זיהוי:</b> לקוח קיים = ת"ז + OTP לנייד הרשום; חדש ממשיך אנונימי. <span class="chip c-yellow">הכיוון מההקראה</span></li>
+      <li><b>MDM:</b> שואב שדות לקוח קיים (רשימה מוגדרת בדרישה).</li>
+      <li><b>משרד הפנים:</b> API דרך לאומי שש"ה (<code>0791is_12_02</code>); קלט ת"ז+ת.לידה+ת.הנפקה; פלט מין/מען/פטירה. <span class="chip c-yellow">נגישות לדיגיטל לתיקוף</span></li>
+      <li><b>תקרה:</b> ערך דינמי מהליבה (משתנה <code>Deposit_Limit_Gemel_Hashkaa</code>); מנכה הו"ק עתידית.</li>
+      <li><b>RAM:</b> רץ מאחורי הקלעים לפי ת"ז + סכומים; מחזיר "נדרש/לא" ו"חשוד/לא".</li>
+      <li><b>KYC קיים מ-5 שנים</b> → לא פותחים שוב, מתייקים ומריצים RAM (מקור: דרישה §10.1).</li>
+      <li><b>הו"ק אוטומטית:</b> הממשק קיים בצד התפעול, לא בדיגיטל → שלב א' לוכד טופס חתום ומשדר; אוטומציה מלאה = שלב ב'.</li>
+      <li><b>עורף:</b> Glikson→XML קיים→סיגל; ממשק יומי לנוגה 17:00 א'–ה'; תיוק IMAGE (יהודית מנדלבאום).</li>
+      <li><b>סשן:</b> 30 דק' → ליד ל-SF. <span class="chip c-yellow">סתירה 20/30 דק'</span> · אנליטיקס Glassbox (NFR).</li>
+    </ul>
+    <h4 class="grp">רוחבי (NFR)</h4>
+    <ul class="clean">
+      <li><b>זמינות + fallback</b> לכל ממשק חיצוני (משרד הפנים/RAM/תקרה/הו"ק) — כשל לא ימנע הצטרפות שלא לצורך.</li>
+      <li><b>נגישות</b> (תקן לתיקוף) · <b>אבטחה ופרטיות</b> (PII, OTP, מסמכים).</li>
+      <li><b>הסכמה ותיעוד</b> (consent/audit) · <b>שמירת התקדמות</b> X ימים (לתיקוף).</li>
+      <li><b>ביצועים</b> בקריאות online · <b>ללא שינוי</b> בטופס וב-XML היוצאים.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== TAB 3 — QUESTIONS ===================== -->
+  <section class="panel" id="t3">
+    <div class="ptitle">❓ שאלות פתוחות <span class="chip c-red" style="font-size:13px">10 חוסמים</span></div>
+    <p class="ppurpose">בנק השאלות המרוכז — מאורגן לפי קבוצות ועדיפות. סננו לפי חומרה:</p>
+
+    <div class="filterbar">
+      <button class="fbtn active" onclick="filterQ(this,'all')">הכול</button>
+      <button class="fbtn" onclick="filterQ(this,'red')">🔴 חוסמים</button>
+      <button class="fbtn" onclick="filterQ(this,'open')">פתוחות בלבד</button>
+      <button class="fbtn" onclick="filterQ(this,'done')">✅ נסגרו</button>
+    </div>
+
+    <div class="callout"><span class="ttl">🔝 עדיפות עליונה — החוסמים, לפי סדר</span>
+      1. E1 מודל זיהוי (אפי/מיכל, 15.6) · 2. E3 נתונים לפי סוג לקוח · 3. T-6 מיפוי שירות הו"ק · 4. E5 מתי מקפיצים KYC · 5. E19 עץ החלטות KYC · 6. E7 לקוח חשוד · 7. T-2/T-15 משרד הפנים · 8. T-1 שירות זיהוי · 9. E20 OKR/KPI.
+    </div>
+
+    <h4 class="grp">עסקי · מדידה ו-OKR</h4>
+    <div class="q red" data-sev="red"><span class="qid">E20</span><div class="qbody">OKR/KPI ובייסליין — מה הבעיות היום, אילו מדדים (נטישה?), מה ה-conversion rate והתפלגות ה-Drop.<span class="qsrc">תום · בסיס ל-KPIs ב-PRD</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E17</span><div class="qbody">ריג'קטים — אילו עולים היום ו<b>כמה</b>? האם הפחתתם היא ה-KPI הרשמי?<span class="qsrc">תום</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E21</span><div class="qbody">נפח — כמה לקוחות מצטרפים לגמל"ש בחודש/בשנה?<span class="qsrc">תום</span></div></div>
+
+    <h4 class="grp">עסקי · זיהוי וסוגי לקוח</h4>
+    <div class="q red" data-sev="red"><span class="qid">E1</span><div class="qbody">מודל הזיהוי — המסכים לא מזהים באמת. הכיוון: שאלת "קיים/חדש" → קיים עובר לוגין (ת"ז+OTP לנייד רשום).<span class="qsrc">חוסם את כל שירותי הליבה · אפי/מיכל, 15.6</span></div></div>
+    <div class="q red" data-sev="red"><span class="qid">E3</span><div class="qbody">מה כל סוג לקוח מספק מול מה שיש לנו — לקוח מוכר עם גמל"ש: מוסר פרטים או כבר ידועים? צריך משרד הפנים בכלל? הבדל מידע עם/בלי קופה? צילום ת"ז שוב?<span class="qsrc">תום + הקראה · → מטריצה בטאב 04</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E2</span><div class="qbody">הבדל עסקי בין לקוח קיים עם קופה לבין בלי קופה?<span class="qsrc">תום</span></div></div>
+
+    <h4 class="grp">עסקי · KYC / AML</h4>
+    <div class="q red" data-sev="red"><span class="qid">E5</span><div class="qbody">מתי בדיוק מקפיצים KYC — חישוב online של קיים + מה שהוזן (חד-פעמי+הו"ק) ≥ 70K? כולל לקוח 30K חד-פעמי בלבד.<span class="qsrc">תום</span></div></div>
+    <div class="q red" data-sev="red"><span class="qid">E19</span><div class="qbody">עץ ההחלטות של KYC — מה קורה ב-PEP? (חסימה גורפת חריגה; בד"כ EDD ולא חסימה.) ושאר ההסתעפויות.<span class="qsrc">תום</span></div></div>
+    <div class="q red" data-sev="red"><span class="qid">E7</span><div class="qbody">לקוח חשוד (מסלול אדום) — התרחיש קיים דיגיטלית? הכסף/הו"ק מוקמים או מוחזקים? <b>סתירה במסמך.</b><span class="qsrc">תום · לבחון</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E6</span><div class="qbody">תוקף KYC — כל שנה / פעם / 5 שנים? והאם מזהים מילוי קודם ולא מציגים שוב?<span class="qsrc">תום · דרישה §10.1</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E8</span><div class="qbody">שדות ברירת מחדל בשאלון — להוסיף לדרישה את החסרים.<span class="qsrc">הקראה — אפי</span></div></div>
+
+    <h4 class="grp">עסקי · סכומים ותקרה</h4>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E24</span><div class="qbody">לקוח שמיצה את התקרה — חוסמים כבר בכניסה לפלואו, או מאפשרים להתחיל ואז חוסמים?<span class="qsrc">תום</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E18</span><div class="qbody">חריגת סכום (UX) — מה גובר, מה מתאפס? <b>דיפולט מוצע:</b> חסימת המשך + הצגת היתרה + עריכה ידנית.<span class="qsrc">תום · להכרעה</span></div></div>
+
+    <h4 class="grp">עסקי · תשלום ומסמכים</h4>
+    <div class="q purple" data-sev="purple"><span class="qid">E9</span><div class="qbody">הקמת הו"ק אוטומטית — שלב א' או ב'? (דרישה "מיידית" ↔ הקראה "שלב ב'").<span class="qsrc">סתירה</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E10</span><div class="qbody">"5 הבנקים הגדולים" — מי בדיוק (כולל בנות) ומה קורה לשאר?<span class="qsrc">דוח השוואה</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E11</span><div class="qbody">למה מורידים את ההפקדה ב-Open Finance (O.F)? זמני או סופי?<span class="qsrc">תום · הקראה</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E28</span><div class="qbody">חתימה גרפית — רק כשמדובר באחד מ-5 הבנקים הגדולים (שעבורם מפיקים אוטומטית הרשאה לחיוב)?<span class="qsrc">תום · קשור B15</span></div></div>
+
+    <h4 class="grp">עסקי · תהליך וחוויה</h4>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E22</span><div class="qbody">למה בוחרים קופה קיימת/חדשה <b>לפני</b> "עבור מי ההפקדה"? למה לא הפוך?<span class="qsrc">תום</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E23</span><div class="qbody">מה הלקוח רואה אחרי סיום — "קופה בתהליך הקמה" איפשהו (מגדל שלי)?<span class="qsrc">תום</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E25</span><div class="qbody">עדיפות מובייל מול דסקטופ — יש מיקוד לאחד?<span class="qsrc">תום</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E26</span><div class="qbody">שמירת התקדמות — כמה זמן שומרים מידע בתהליך נטוש? (בדרישה: "X יום — להבין לכמה").<span class="qsrc">דרישה · NFR</span></div></div>
+
+    <h4 class="grp">עסקי · רכיבים שאולי "נפלו" <span style="font-weight:400; font-size:12px">(תום לבדוק)</span></h4>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E12</span><div class="qbody">מוטבים — לא נצפה מסך בעיצוב החדש. נדרש רגולטורית?<span class="qsrc">דוח השוואה</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E13</span><div class="qbody">סימולטור תשואות "ללמוד עוד" — בתכולה? מורכב לפיתוח.<span class="qsrc">תום לבדוק</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E14</span><div class="qbody">אופן קבלת מסמכים (מייל/מסרון/דואר) — בוטל לטובת דיגיטל, או להשאיר בחירה?<span class="qsrc">תום — נוסח מחדש</span></div></div>
+
+    <h4 class="grp">עסקי · קטין וסיכום</h4>
+    <div class="q yellow" data-sev="yellow"><span class="qid">E15</span><div class="qbody">מסלול קטין — אפוטרופסות, הורה שני, הצהרות, צילום ת"ז+ספח: מה בדיוק נדרש?<span class="qsrc">תום לבדוק</span></div></div>
+    <div class="q purple" data-sev="purple"><span class="qid">E16</span><div class="qbody">מסך סיכום עם גרף — לא בשלב 1 (הקראה); לציין בדרישה.<span class="qsrc">הקראה — אפי</span></div></div>
+
+    <h4 class="grp">טכני · זיהוי וממשקים</h4>
+    <div class="q red" data-sev="red"><span class="qid">T-1</span><div class="qbody">שירות זיהוי (ת"ז + OTP לנייד רשום) — קיים לדיגיטל? איך הנייד נשלף? אם אין נייד רשום?<span class="qsrc">הקראה</span></div></div>
+    <div class="q red" data-sev="red"><span class="qid">T-2</span><div class="qbody">משרד הפנים — נגישות לדיגיטל לא מאומתת; בהקראה "אולי שלב ב'".<span class="qsrc">הקראה — מיכל/אפי</span></div></div>
+    <div class="q red" data-sev="red"><span class="qid">T-15</span><div class="qbody">משרד הפנים — תרחישים: (א) קלט קיים ללקוח קיים? (ב) תשובה שלילית — מה עושים? (ג) תשובה חיובית — <b>פוטרת מצילום ת"ז?</b><span class="qsrc">תום</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-3</span><div class="qbody">RAM — נגיש לדיגיטל ובאילו תהליכים בשימוש? (לדעת תום לא בהכרח קשור ל-LPS.)<span class="qsrc">מיכל #8 · תום</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-4</span><div class="qbody">MDM — זמינות וחוזה לשליפת שדות לקוח קיים.<span class="qsrc">דרישה</span></div></div>
+
+    <h4 class="grp">טכני · ליבה ותשלום</h4>
+    <div class="q red" data-sev="red"><span class="qid">T-6</span><div class="qbody">שירות "העברה ישירה / הקמת הו"ק" — מיפוי מלא: מהו, איפה בשימוש, תלויות. <b>לא ברור איך אמור לעבוד.</b><span class="qsrc">תום + הקראה — לצרף גל זילברמן</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-7</span><div class="qbody">שוטף + חד-פעמי באותה הוראה — היום לא נתמך; לאפשר שידור מאוחד/פיצול.<span class="qsrc">דרישה</span></div></div>
+    <div class="q purple" data-sev="purple"><span class="qid">T-8</span><div class="qbody">שירות הו"ק חד-פעמי — לא קיים בדיגיטל; אם נדרש לשלב 1.<span class="qsrc">מיכל #6</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-13</span><div class="qbody">משימה 358432 (יהודית, פרויקט 6041) — שידור מיד עם הקמת הו"ק ב-CRM. מה בדיוק הדרישה?<span class="qsrc">דרישה · תום</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-14</span><div class="qbody">שירות תקרה שנתית — איך הדיגיטל שואב את הערך, איזה API, מי מעדכן ומתי?<span class="qsrc">תום · דרישה §9</span></div></div>
+
+    <h4 class="grp">טכני · מצב קיים + עורף</h4>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-16</span><div class="qbody">מצב קיים — איך לקוח מפקיד היום במובייל? איך עובד היום תהליך הקמת הו"ק?<span class="qsrc">תום</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-9</span><div class="qbody">timeout — 20 או 30 דקות? סתירה במסמך.<span class="qsrc">דרישה</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-10</span><div class="qbody">שידור והפקה — לוודא חוזה מול Glikson/סיגל/נוגה ותיוק IMAGE.<span class="qsrc">דרישה</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-11</span><div class="qbody">NFR אנליטיקס (Glassbox) — פרמטרי שלב, Visual Name, שגיאות אדומות, Ajax.<span class="qsrc">דרישה</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-12</span><div class="qbody">placeholder — מי הבעלים של הניסוחים במסכי הסיכום/הצלחה ומה הדדליין?<span class="qsrc">דוח השוואה</span></div></div>
+    <div class="q yellow" data-sev="yellow"><span class="qid">T-17</span><div class="qbody">התנהגות בכשל ממשק — מה ה-UX כשמשרד הפנים/RAM/תקרה/הו"ק לא זמינים? נדרש fallback לכל אחד.<span class="qsrc">NFR · סקירה</span></div></div>
+
+    <h4 class="grp">✅ נסגרו</h4>
+    <div class="q done" data-sev="done"><span class="qid">E4</span><div class="qbody">מוצרי סף ה-KYC — מוגדר §10.1: גמל להשקעה · קרן פנסיה עצמאי · קרן השתלמות עצמאי · גמל לפיצויים/תגמולים. <span class="chip c-yellow">הערה</span> לאחד עצמאי/משלימה.<span class="qsrc">נסגר ע"י תום</span></div></div>
+    <div class="q done" data-sev="done"><span class="qid">T-5</span><div class="qbody">תקרה ללקוח חדש — רק לפי מה שמזין (אין היסטוריה). RAM לפי ת"ז.<span class="qsrc">הוכרע</span></div></div>
+  </section>
+
+  <!-- ===================== TAB 4 — MATRIX ===================== -->
+  <section class="panel" id="t4">
+    <div class="ptitle">🧮 מטריצת נתונים לפי סוג לקוח</div>
+    <p class="ppurpose">מה כל סוג לקוח חייב לספק מול מה שכבר יש לנו. תאים 🟡 = תלויים בהכרעות פתוחות.</p>
+
+    <div class="legend"><b style="color:var(--navy)">מקרא תאים:</b>
+      <span>🟢 כבר יש לנו</span><span>✍️ הלקוח ממלא</span><span>➖ לא נדרש</span><span>🔗 מותנה</span><span>🟡 פתוח/תלוי הכרעה</span>
+    </div>
+
+    <div class="pill-row">
+      <span class="pill">A · חדש לגמרי</span><span class="pill">B · מוכר ללא גמל"ש</span><span class="pill">C · קיים עם גמל"ש</span><span class="pill">D · קטין</span><span class="pill" style="background:#EEF1F5;color:var(--gray);border-color:#dfe4ea">E · הפקדה-לקיים → LPS (מחוץ)</span>
+    </div>
+
+    <h3 class="sub">זיהוי ופרטים אישיים</h3>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>פריט</th><th>A · חדש</th><th>B · מוכר</th><th>C · קיים גמל"ש</th><th>D · קטין</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">לוגין / זיהוי</td><td>🟡 אנונימי</td><td>🟢 לוגין</td><td>🟢 לוגין</td><td>🟢 ההורה</td></tr>
+        <tr><td class="lbl">שם פרטי+משפחה</td><td>✍️</td><td>🟢 MDM</td><td>🟢 MDM</td><td>✍️ ילד + הורה</td></tr>
+        <tr><td class="lbl">ת"ז</td><td>✍️</td><td>🟢/✍️</td><td>🟢/✍️</td><td>✍️ ילד + הורה</td></tr>
+        <tr><td class="lbl">נייד + מייל</td><td>✍️</td><td>🟢 MDM</td><td>🟢 MDM</td><td>🟢 הורה</td></tr>
+        <tr><td class="lbl">תאריך לידה / מין / כתובת</td><td>🟡 משרד הפנים / ✍️</td><td>🟡 MDM</td><td>🟡 MDM</td><td>🟡</td></tr>
+        <tr><td class="lbl">תאריך הנפקת ת"ז</td><td>✍️</td><td>🟡 ✍️</td><td>🟡 ✍️</td><td>✍️</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout"><b>התובנה:</b> עבור B/C המזוהים — חלק מהשדות כבר ב-MDM. שאלות <b>E3</b> ו-<b>E2</b> קובעות כמה תאים הופכים מ-✍️ ל-🟢/➖.</div>
+
+    <h3 class="sub">מסמכים, הצהרות וחתימה</h3>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>פריט</th><th>A · חדש</th><th>B · מוכר</th><th>C · קיים גמל"ש</th><th>D · קטין</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">צילום ת"ז (קדמי/אחורי)</td><td>✍️ — 🟡 אם משרד הפנים מחליף</td><td>🟡 שוב?</td><td>🟡 שוב?</td><td>🟡 ילד + ספח</td></tr>
+        <tr><td class="lbl">אימות משרד הפנים</td><td>🔗 אם בתכולה</td><td>🟡 נדרש?</td><td>🟡</td><td>🟡</td></tr>
+        <tr><td class="lbl">הצהרת תושבות מס</td><td>✍️ חובה</td><td>✍️ חובה</td><td>✍️ חובה</td><td>✍️ נוסח ילד</td></tr>
+        <tr><td class="lbl">הצהרות אפוטרופסות</td><td>➖</td><td>➖</td><td>➖</td><td>✍️ 🟡 הורה שני?</td></tr>
+        <tr><td class="lbl">חתימה דיגיטלית (הרשאה)</td><td>🔗</td><td>🔗</td><td>🔗</td><td>🔗 ההורה</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">רגולציה וכסף</h3>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>פריט</th><th>A · חדש</th><th>B · מוכר</th><th>C · קיים גמל"ש</th><th>D · קטין</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">חישוב תקרה</td><td>🟢 רק לפי מה שמזין</td><td>🟢 לפי הפקדות בליבה</td><td>🟢 כולל ניכוי קופות קיימות + הו"ק</td><td>🟡 על ת"ז הילד</td></tr>
+        <tr><td class="lbl">הפעלת KYC (70K)</td><td>🔗 רק ההפקדה הנוכחית</td><td>🔗 מצטבר</td><td>🔗 כולל קופות קיימות</td><td>🟡</td></tr>
+        <tr><td class="lbl">RAM / חשוד</td><td>🟢 לפי ת"ז</td><td>🟢 לפי ת"ז</td><td>🟢 לפי ת"ז</td><td>🟡</td></tr>
+        <tr><td class="lbl">פרטי בנק + סוג העברה</td><td>✍️</td><td>🟢/✍️</td><td>🟢/✍️</td><td>✍️ חשבון הורה</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- ===================== TAB 5 — STRUCTURE ===================== -->
+  <section class="panel" id="t5">
+    <div class="ptitle">🗺️ מבנה הדרישה · PRD / SDD</div>
+    <p class="ppurpose">איך בונים את הדרישה — מאפיק אחד ועד ה-Specs — ולוג ההחלטות.</p>
+
+    <h3 class="sub">המבנה: אפיק יחיד → אזורים → Stories → Specs</h3>
+    <div class="arrow-flow">
+      <span class="box" style="border-color:var(--navy)"><b>אפיק יחיד</b><br>הצטרפות לגמל"ש</span><span class="ar">←</span>
+      <span class="box">אזורי-יכולת<br>(= אפיקי הטמפלייט)</span><span class="ar">←</span>
+      <span class="box">User Stories<br>(הרבה, בכל אזור)</span><span class="ar">←</span>
+      <span class="box" style="border-color:var(--blue); background:var(--blue-soft)"><b>Spec</b><br>לכל story עסקי</span>
+    </div>
+
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>אזור-יכולת (= אפיק)</th><th>מכסה</th><th>דוגמאות ל-User Stories</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">🟦 כניסה וזיהוי</td><td>ערוצים, OTP, קיים/חדש, משרד הפנים, פרטים</td><td>זיהוי קיים (ת"ז+OTP) · המשך אנונימי · ניתוב קופה קיימת</td></tr>
+        <tr><td class="lbl">🟩 סכום, מסלולים ותקרה</td><td>תדירות, סכום, תקרה דינמית, מסלולים</td><td>הזנת סכום מול תקרה · חריגת סכום · מסלולים עד 100%</td></tr>
+        <tr><td class="lbl">🟨 היכרות פיננסית</td><td>סף, RAM, שאלון, PEP, מסלול אדום</td><td>טריגר KYC · מילוי שאלון · ניתוב מסלול אדום</td></tr>
+        <tr><td class="lbl">🟪 תשלום, מסמכים והפקה</td><td>סוג העברה, הו"ק/5 בנקים, חתימה, מסמכים, שידור</td><td>העברה ישירה + חתימה · העלאת ת"ז · הפקה ושידור</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">מודל ה-Specs (3 שכבות)</h3>
+    <div class="two">
+      <div class="card"><b>1 · Constitution</b><br><span style="font-size:13.5px;color:var(--gray)">עקרונות-על שלא משתנים: straight-through, זיהוי-תחילה, ציות-מובנה, חוזי-ממשקים מפורשים.</span></div>
+      <div class="card"><b>2 · Story-specs <span class="chip c-blue">עמוד השדרה</span></b><br><span style="font-size:13.5px;color:var(--gray)">כל User Story עסקי → spec: זרימה, מצבי שגיאה, קריטריוני קבלה. (נגזר מהשאלות E.)</span></div>
+    </div>
+    <div class="card"><b>3 · Shared / Contract-specs</b><br><span style="font-size:13.5px;color:var(--gray)">יחידות לשימוש-חוזר שה-stories מפנים אליהן: ממשקים (משרד הפנים, OTP, RAM, הו"ק, Glikson, MDM) וכללים חוצים (תקרה, טריגר KYC, מטריצת מצבים, עץ AML). ≈ שאלות ה-T.</span></div>
+    <p style="font-size:13.5px;color:var(--gray)"><b>עיקרון:</b> spec = התרגום של User Story עסקי ל-specification. ברירת מחדל story אחד → spec אחד (לעיתים יותר, אם יש חוזה טכני נפרד).</p>
+
+    <h3 class="sub">לוג החלטות תכולה</h3>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>#</th><th>החלטה</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>תוצר: <b>PRD בטמפלייט מגדל</b> קודם → אחר כך SDD</td></tr>
+        <tr><td>2</td><td>מאפיינים את כל החזון, מתייגים שלב ב'</td></tr>
+        <tr><td>3</td><td>ערוצים: אתר שיווקי · אזור אישי · אפליקציה (השאר לא כעת)</td></tr>
+        <tr><td>4</td><td>דסקטופ + מובייל</td></tr>
+        <tr><td>5</td><td>5 סוגי לקוח (כולל הפקדה-לקיים → LPS)</td></tr>
+        <tr><td>6</td><td>הפקדה לקופה קיימת — מחוץ לתכולה (הפניה ל-LPS)</td></tr>
+        <tr><td>7</td><td><b>אפיק יחיד</b> → אזורים → Stories → Spec לכל story עסקי</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">הגדרת "מוכן" לדרישה</h3>
+    <ul class="clean">
+      <li>כל ה-🔴 נסגרו (זיהוי, סף/טריגר KYC, מסלול אדום, נתוני לקוח, שירות הו"ק, תקרה).</li>
+      <li>גבול שלב א'/ב' מקובע ומתויג.</li>
+      <li>מטריצת סוגי הלקוח מלאה — אין תאי 🟡.</li>
+      <li>טבלת החלטות מצבים (תדירות × העברה × בנק × לקוח) חד-משמעית.</li>
+      <li>חוזי הממשקים מאומתים (קיום + נגישות לדיגיטל).</li>
+      <li>תוכן ה-placeholder הוחלף ואושר; הסתירות הפנימיות נפתרו.</li>
+    </ul>
+  </section>
+
+  <!-- ===================== TAB 6 — STORIES & SPECS ===================== -->
+  <section class="panel" id="t6">
+    <div class="ptitle">🧩 User Stories ו-Specs</div>
+    <p class="ppurpose">הפירוק לפיתוח: אפיק → אזורים → User Stories → Specs. עיקרון: <b>spec = התרגום של User Story עסקי</b>.</p>
+
+    <div class="arrow-flow">
+      <span class="box" style="border-color:var(--navy)"><b>אפיק יחיד</b></span><span class="ar">←</span>
+      <span class="box">אזורי-יכולת</span><span class="ar">←</span>
+      <span class="box">User Stories</span><span class="ar">←</span>
+      <span class="box" style="border-color:var(--blue);background:var(--blue-soft)"><b>story-spec</b> + shared-specs</span>
+    </div>
+    <div class="legend"><b style="color:var(--navy)">שלב:</b> <span class="chip c-green">A</span> שלב א' · <span class="chip c-purple">B</span> שלב ב' · <span class="chip c-blue">A/B</span> חלקי · <b style="color:var(--navy)">חסום</b> = מזהה שאלה בטאב 03</div>
+
+    <h3 class="sub">Constitution — עקרונות-על</h3>
+    <div class="card" style="font-size:14px"><b>1.</b> Identity-first &nbsp;·&nbsp; <b>2.</b> Straight-through (מנגנון) &nbsp;·&nbsp; <b>3.</b> Compliance-by-design &nbsp;·&nbsp; <b>4.</b> חוזי-ממשקים מפורשים (שגיאות/timeout/fallback) &nbsp;·&nbsp; <b>5.</b> מקור-אמת יחיד לכללים חוצים &nbsp;·&nbsp; <b>6.</b> משמעת provenance &nbsp;·&nbsp; <b>7.</b> חתימה אחת &nbsp;·&nbsp; <b>8.</b> רב-ערוציות + נגישות</div>
+
+    <h3 class="sub">אזורים → Stories → Specs</h3>
+
+    <h4 class="grp">🟦 אזור 1 · כניסה וזיהוי</h4>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>Story</th><th>סיפור</th><th>Spec</th><th>שלב</th><th>חסום</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">S-1.1</td><td>כניסה מערוץ (אתר/אזור אישי/אפליקציה)</td><td><span class="chip c-gray">spec-entry-channels</span></td><td><span class="chip c-green">A</span></td><td>—</td></tr>
+        <tr><td class="lbl">S-1.2</td><td>בחירת "לקוח קיים/חדש"</td><td><span class="chip c-gray">spec-customer-gate</span></td><td><span class="chip c-green">A</span></td><td>E1</td></tr>
+        <tr><td class="lbl">S-1.3</td><td>זיהוי קיים (ת"ז + OTP לנייד רשום)</td><td><span class="chip c-gray">spec-login-otp</span></td><td><span class="chip c-green">A</span></td><td>E1, T-1</td></tr>
+        <tr><td class="lbl">S-1.4</td><td>המשך אנונימי + OTP</td><td><span class="chip c-gray">spec-anon-otp</span></td><td><span class="chip c-green">A</span></td><td>E1, T-1</td></tr>
+        <tr><td class="lbl">S-1.5</td><td>כשל OTP → שליחה חוזרת / מייל</td><td><span class="chip c-gray">spec-otp-fallback</span></td><td><span class="chip c-green">A</span></td><td>T-1</td></tr>
+        <tr><td class="lbl">S-1.6</td><td>ניתוב קופה קיימת (→LPS / חדשה)</td><td><span class="chip c-gray">spec-existing-hub</span></td><td><span class="chip c-green">A</span></td><td>E2, E22</td></tr>
+        <tr><td class="lbl">S-1.7</td><td>"עבור מי" (עצמי / ילד)</td><td><span class="chip c-gray">spec-for-whom</span></td><td><span class="chip c-green">A</span></td><td>E22</td></tr>
+        <tr><td class="lbl">S-1.8</td><td>שליפת מען ממשרד הפנים</td><td><span class="chip c-gray">spec-moi-pull</span></td><td><span class="chip c-blue">A/B</span></td><td>T-2, T-15</td></tr>
+        <tr><td class="lbl">S-1.9</td><td>הקלדה ידנית (fallback)</td><td><span class="chip c-gray">spec-manual-address</span></td><td><span class="chip c-green">A</span></td><td>T-15</td></tr>
+        <tr><td class="lbl">S-1.10</td><td>הצהרת תושבות מס</td><td><span class="chip c-gray">spec-tax-residency</span></td><td><span class="chip c-green">A</span></td><td>—</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4 class="grp">🟩 אזור 2 · סכום, מסלולים ותקרה</h4>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>Story</th><th>סיפור</th><th>Spec</th><th>שלב</th><th>חסום</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">S-2.1</td><td>בחירת תדירות (חד/חודשי/גם-וגם)</td><td><span class="chip c-gray">spec-frequency</span></td><td><span class="chip c-green">A</span></td><td>—</td></tr>
+        <tr><td class="lbl">S-2.2</td><td>סכום מול חישוב התקרה</td><td><span class="chip c-gray">spec-amount-ceiling</span></td><td><span class="chip c-green">A</span></td><td>T-14</td></tr>
+        <tr><td class="lbl">S-2.3</td><td>חריגת סכום (חסימה + יתרה)</td><td><span class="chip c-gray">spec-overflow</span></td><td><span class="chip c-green">A</span></td><td>E18</td></tr>
+        <tr><td class="lbl">S-2.4</td><td>מיצוי תקרה (הפניה לת"ז אחר)</td><td><span class="chip c-gray">spec-ceiling-exhausted</span></td><td><span class="chip c-green">A</span></td><td>E24</td></tr>
+        <tr><td class="lbl">S-2.5</td><td>בחירת עד 6 מסלולים (100%)</td><td><span class="chip c-gray">spec-tracks</span></td><td><span class="chip c-green">A</span></td><td>—</td></tr>
+        <tr><td class="lbl">S-2.6</td><td>סימולטור תשואות "ללמוד עוד"</td><td><span class="chip c-gray">spec-returns-sim</span></td><td><span class="chip c-purple">B</span></td><td>E13</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4 class="grp">🟨 אזור 3 · היכרות פיננסית (KYC/AML)</h4>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>Story</th><th>סיפור</th><th>Spec</th><th>שלב</th><th>חסום</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">S-3.1</td><td>טריגר KYC מול RAM (לפי סף)</td><td><span class="chip c-gray">spec-kyc-trigger</span></td><td><span class="chip c-green">A</span></td><td>E5, T-3</td></tr>
+        <tr><td class="lbl">S-3.2</td><td>מילוי שאלון (PEP, מקור כספים…)</td><td><span class="chip c-gray">spec-kyc-questionnaire</span></td><td><span class="chip c-green">A</span></td><td>E19</td></tr>
+        <tr><td class="lbl">S-3.3</td><td>שאלה חוסמת → הודעה + תיקון</td><td><span class="chip c-gray">spec-kyc-blocking</span></td><td><span class="chip c-green">A</span></td><td>E19</td></tr>
+        <tr><td class="lbl">S-3.4</td><td>ניתוב מסלול אדום (AML)</td><td><span class="chip c-gray">spec-aml-redpath</span></td><td><span class="chip c-green">A</span></td><td>E7, E19</td></tr>
+        <tr><td class="lbl">S-3.5</td><td>KYC קיים מ-5 שנים → לא לפתוח</td><td><span class="chip c-gray">spec-kyc-reuse</span></td><td><span class="chip c-green">A</span></td><td>E6</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4 class="grp">🟪 אזור 4 · תשלום, חשבון וסוג העברה</h4>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>Story</th><th>סיפור</th><th>Spec</th><th>שלב</th><th>חסום</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">S-4.1</td><td>הזנת פרטי חשבון בנק</td><td><span class="chip c-gray">spec-bank-details</span></td><td><span class="chip c-green">A</span></td><td>—</td></tr>
+        <tr><td class="lbl">S-4.2</td><td>העברה ישירה + חתימה (מגדל מקימה הו"ק)</td><td><span class="chip c-gray">spec-direct-debit</span></td><td><span class="chip c-blue">A/B</span></td><td>T-6, E9</td></tr>
+        <tr><td class="lbl">S-4.3</td><td>העברה ידנית / העלאת טופס הרשאה</td><td><span class="chip c-gray">spec-manual-transfer</span></td><td><span class="chip c-green">A</span></td><td>E10</td></tr>
+        <tr><td class="lbl">S-4.4</td><td>חד-פעמי + חודשי (2 הוראות / מאוחדת)</td><td><span class="chip c-gray">spec-combined-orders</span></td><td><span class="chip c-blue">A/B</span></td><td>T-7</td></tr>
+      </tbody>
+    </table></div>
+
+    <h4 class="grp">⬜ אזור 5 · מסמכים, סיכום והפקה</h4>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>Story</th><th>סיפור</th><th>Spec</th><th>שלב</th><th>חסום</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">S-5.1</td><td>העלאת צילום ת"ז (קדמי/אחורי)</td><td><span class="chip c-gray">spec-id-upload</span></td><td><span class="chip c-green">A</span></td><td>T-15, E3</td></tr>
+        <tr><td class="lbl">S-5.2</td><td>העלאת טופס הרשאה (חודשי, לא-5-בנקים)</td><td><span class="chip c-gray">spec-mandate-upload</span></td><td><span class="chip c-green">A</span></td><td>E10</td></tr>
+        <tr><td class="lbl">S-5.3</td><td>מסך סיכום + צ'קבוקסים</td><td><span class="chip c-gray">spec-summary</span></td><td><span class="chip c-green">A</span></td><td>T-12</td></tr>
+        <tr><td class="lbl">S-5.4</td><td>מסך הצלחה (מספר קופה)</td><td><span class="chip c-gray">spec-success</span></td><td><span class="chip c-green">A</span></td><td>E23</td></tr>
+        <tr><td class="lbl">S-5.5</td><td>שידור XML + תיוק IMAGE + תור עבודה</td><td><span class="chip c-gray">spec-backend-emit</span></td><td><span class="chip c-green">A</span></td><td>T-10</td></tr>
+        <tr><td class="lbl">S-5.6</td><td>נטישה → SMS לחזרה לאותה נקודה</td><td><span class="chip c-gray">spec-abandonment</span></td><td><span class="chip c-green">A</span></td><td>E26</td></tr>
+        <tr><td class="lbl">S-5.7</td><td>קופה "בתהליך הקמה" במגדל שלי</td><td><span class="chip c-gray">spec-pending-fund</span></td><td><span class="chip c-blue">A/B</span></td><td>E23</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout"><b>קטין (סוג לקוח D)</b> אינו אזור נפרד אלא <b>וריאנט חוצה</b> של S-1.7 / S-1.8 / S-5.1 — מנוהל כתרחישי-בדיקה נוספים בכל story רלוונטי. חסום ע"י E15.</div>
+
+    <h3 class="sub">Shared / Contract-Specs</h3>
+    <p style="font-size:13.5px;color:var(--gray)">יחידות לשימוש-חוזר שה-stories מפנים אליהן. ≈ אחד-לאחד לשאלות הטכניות (T).</p>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>Spec משותף</th><th>תיאור</th><th>שאלה</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">SS-IDENTITY</td><td>זיהוי + OTP (ייצור/אימות, נייד רשום, fallback)</td><td>T-1</td></tr>
+        <tr><td class="lbl">SS-MOI</td><td>ממשק משרד הפנים (קלט/פלט, 6 שגיאות, fallback)</td><td>T-2, T-15</td></tr>
+        <tr><td class="lbl">SS-MDM</td><td>שליפת שדות לקוח קיים</td><td>T-4</td></tr>
+        <tr><td class="lbl">SS-CEILING</td><td>מנוע תקרה דינמי (ניכוי הו"ק עתידית)</td><td>T-14</td></tr>
+        <tr><td class="lbl">SS-RAM</td><td>שירות כפיפות ("נדרש"/"חשוד")</td><td>T-3</td></tr>
+        <tr><td class="lbl">SS-KYC-RULES</td><td>טריגר + עץ החלטות + מסלול אדום + PEP</td><td>E5, E19, E7</td></tr>
+        <tr><td class="lbl">SS-STANDING-ORDER</td><td>הקמת הו"ק / העברה ישירה (קוד מוסד 602)</td><td>T-6, T-7, T-13</td></tr>
+        <tr><td class="lbl">SS-BACKEND</td><td>Glikson→XML, נוגה, תיוק IMAGE</td><td>T-10</td></tr>
+        <tr><td class="lbl">SS-STATE-MATRIX</td><td>טבלת ההחלטות (תדירות × בנק × תשלום)</td><td>—</td></tr>
+        <tr><td class="lbl">SS-ANALYTICS</td><td>Glassbox + ליד ל-SF</td><td>T-11</td></tr>
+        <tr><td class="lbl">SS-SESSION</td><td>timeout, שמירת התקדמות, חזרה ב-OTP</td><td>T-9</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">טבלת ההחלטות המרכזית <span class="chip c-blue">ליבת ה-SDD</span></h3>
+    <p style="font-size:13.5px;color:var(--gray)">מכריעה אילו מסכים/specs מופעלים לכל צירוף. (ערכים לאימות מול הצוות.)</p>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>תדירות \ בנק</th><th>5 הגדולים</th><th>בנק אחר</th></tr></thead>
+      <tbody>
+        <tr><td class="lbl">חד-פעמי</td><td>העברה ישירה (הו"ק חד"פ) + חתימה / או העברה בנקאית</td><td>העברה בנקאית ידנית</td></tr>
+        <tr><td class="lbl">חודשי</td><td>העברה ישירה (הו"ק שוטף) + חתימה</td><td>העברה בנקאית + <b>העלאת טופס הרשאה</b></td></tr>
+        <tr><td class="lbl">גם-וגם</td><td>2 הוראות (שוטף + חד"פ) + <b>חתימה אחת</b></td><td>העברה בנקאית + טופס הרשאה</td></tr>
+      </tbody>
+    </table></div>
+    <div class="callout"><span class="ttl">תנאים רוחביים</span>
+      <b>KYC פעיל</b> ⟺ מצטבר ≥ 70,001 ₪ &nbsp;·&nbsp; <b>צילום ת"ז</b> תמיד (אלא אם משרד הפנים מחליף) &nbsp;·&nbsp; <b>טופס הרשאה</b> ⟺ (חודשי/גם-וגם) וגם (לא 5 הגדולים) &nbsp;·&nbsp; <b>מסלול אדום</b> ⟺ RAM "חשוד" → מספר עמית לא מוקצה.
+    </div>
+
+    <h3 class="sub">תבנית Story-Spec</h3>
+    <div class="card" style="font-size:13.5px">Context &amp; user story · Preconditions · Flow (happy path) · Variants &amp; states (כולל קטין) · Validation rules · Error &amp; fallback · Acceptance criteria (Given/When/Then) · Dependencies (shared-specs) · Open questions (קישור לטאב 03)</div>
+  </section>
+
+  </main>
+
+  <footer>
+    הופק עבור שכבת ה-AI-PM של מגדל דיגיטל · אפיון הצטרפות לקופת גמל להשקעה · יוני 2026.<br>
+    מבוסס על: דרישת הדיגיטל · צילומי הפיגמה · הקראת הדרישה · סיכום מיכל נבון · מצגת הכר-את-הלקוח · שאלות תום.
+  </footer>
+
+</div>
+
+<script>
+  function showTab(i){
+    document.querySelectorAll('.panel').forEach((p,idx)=>p.classList.toggle('active', idx===i));
+    document.querySelectorAll('#tabs .tab').forEach((t,idx)=>t.classList.toggle('active', idx===i));
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  function filterQ(btn, sev){
+    document.querySelectorAll('#t3 .fbtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('#t3 .q').forEach(q=>{
+      const s=q.dataset.sev;
+      let show = (sev==='all') || (s===sev) || (sev==='open' && s!=='done');
+      q.style.display = show ? '' : 'none';
+    });
+    document.querySelectorAll('#t3 .grp').forEach(h=>{
+      let n=h.nextElementSibling, any=false;
+      while(n && !n.classList.contains('grp')){ if(n.classList.contains('q') && n.style.display!=='none') any=true; n=n.nextElementSibling; }
+      h.style.display = any ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>
