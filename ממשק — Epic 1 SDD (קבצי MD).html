@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Epic 1 SDD — ממשק קבצי MD</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<style>
+*{box-sizing:border-box}html,body{margin:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Rubik,"Helvetica Neue",Arial,sans-serif;background:#f4f6f9;color:#1f2733;line-height:1.5}
+.top{background:linear-gradient(120deg,#1e3a8a,#2563eb);color:#fff;padding:18px 22px}
+.top h1{margin:0;font-size:19px;font-weight:700}
+.top .sub{margin-top:5px;font-size:12.5px;opacity:.9}
+.treewrap{background:#0f172a;color:#e2e8f0;border-bottom:1px solid #1e293b}
+.treetoggle{width:100%;text-align:start;background:transparent;color:#e2e8f0;border:0;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.tree{margin:0;padding:2px 18px 16px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;line-height:1.65;overflow:auto;direction:ltr;text-align:left}
+.tree.collapsed{display:none}
+.tree a.tl{color:#93c5fd;cursor:pointer;text-decoration:none}
+.tree a.tl:hover{color:#fff;text-decoration:underline}
+.tree .dir{color:#fbbf24;font-weight:700}
+.tabs{display:flex;gap:8px;padding:12px 18px 0;flex-wrap:wrap;background:#fff;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:5}
+.tab{border:1px solid #e5e7eb;background:#f8fafc;color:#374151;padding:8px 14px;border-radius:10px 10px 0 0;font-size:13.5px;cursor:pointer;font-weight:600}
+.tab .cnt{display:inline-block;min-width:18px;padding:0 5px;margin-inline-start:6px;border-radius:9px;background:#e5e7eb;color:#374151;font-size:11px;text-align:center}
+.tab.active{background:#2563eb;color:#fff;border-color:#2563eb}
+.tab.active .cnt{background:rgba(255,255,255,.25);color:#fff}
+.layout{display:flex;align-items:flex-start}
+.sidebar{width:290px;flex:0 0 290px;background:#fff;border-inline-end:1px solid #e5e7eb;height:calc(100vh - 52px);position:sticky;top:52px;overflow:auto;padding:14px}
+#search{width:100%;padding:9px 11px;border:1px solid #e5e7eb;border-radius:9px;font-size:13px;margin-bottom:10px}
+.file{display:block;width:100%;text-align:start;border:0;background:transparent;border-radius:9px;padding:9px 11px;cursor:pointer;margin-bottom:2px}
+.file:hover{background:#f1f5f9}
+.file.active{background:#eff6ff;box-shadow:inset 3px 0 0 #2563eb}
+.file .ft{display:block;font-size:13.5px;font-weight:600;color:#111827;direction:ltr;text-align:start}
+.file .fp{display:block;font-size:11px;color:#9097a1;direction:ltr;text-align:start}
+.empty{color:#9097a1;font-size:13px;padding:10px}
+.content{flex:1;min-width:0;padding:18px 26px 60px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.crumb{font-size:12px;color:#6b7280;direction:ltr;text-align:left;font-family:ui-monospace,Menlo,Consolas,monospace}
+.modes{display:inline-flex;border:1px solid #d7dee8;border-radius:9px;overflow:hidden}
+.mode{background:#fff;border:0;padding:6px 13px;font-size:12.5px;cursor:pointer;color:#475569;font-weight:600}
+.mode+.mode{border-inline-start:1px solid #e5e7eb}
+.mode.active{background:#2563eb;color:#fff}
+.warn{background:#fef3c7;color:#92400e;border:1px solid #fde68a;padding:8px 12px;border-radius:8px;font-size:12.5px;margin-bottom:12px;display:none}
+.md-body{direction:ltr;text-align:left;background:#fff;border:1px solid #e9edf2;border-radius:14px;padding:26px 30px;max-width:940px}
+.md-body h1{font-size:24px;border-bottom:1px solid #eef0f3;padding-bottom:.3em;margin:.2em 0 .6em}
+.md-body h2{font-size:19px;border-bottom:1px solid #f0f2f5;padding-bottom:.25em;margin:1.4em 0 .5em}
+.md-body h3{font-size:16px;margin:1.2em 0 .4em}
+.md-body p{margin:.6em 0}
+.md-body code{background:#f1f5f9;color:#0f172a;padding:.12em .4em;border-radius:5px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.88em}
+.md-body pre{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:10px;overflow:auto}
+.md-body pre code{background:transparent;color:inherit;padding:0}
+.md-body blockquote{margin:.8em 0;padding:.4em 1em;border-inline-start:4px solid #2563eb;background:#f8fafc;color:#334155;border-radius:0 8px 8px 0}
+.md-body table{border-collapse:collapse;width:100%;margin:1em 0;font-size:13px;display:block;overflow:auto}
+.md-body th,.md-body td{border:1px solid #e5e7eb;padding:7px 9px;text-align:start;vertical-align:top;white-space:nowrap}
+.md-body th{background:#f3f6fb;font-weight:700}
+.md-body tr:nth-child(even) td{background:#fafbfc}
+.md-body ul,.md-body ol{padding-inline-start:1.4em;margin:.5em 0}
+.md-body li{margin:.25em 0}
+.md-body hr{border:0;border-top:1px solid #e9edf2;margin:1.4em 0}
+.md-body a{color:#2563eb}
+.raw{white-space:pre-wrap;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}
+/* ===== designed mode ===== */
+.md-body.designed{font-size:15.5px;line-height:1.85;max-width:860px;padding:30px 34px;background:#fff}
+.md-body.designed h1{font-size:27px;border:0;margin:.1em 0 .5em;background:linear-gradient(120deg,#1e3a8a,#2563eb);-webkit-background-clip:text;background-clip:text;color:transparent}
+.md-body.designed h2{font-size:20px;border:0;padding:0 0 0 12px;margin:1.7em 0 .55em;color:#1e3a8a;position:relative}
+.md-body.designed h2::before{content:"";position:absolute;inset-inline-start:0;top:.18em;bottom:.18em;width:4px;border-radius:3px;background:linear-gradient(#2563eb,#1e3a8a)}
+.md-body.designed h3{font-size:16.5px;color:#334155}
+.md-body.designed blockquote{background:#eef4ff;border-inline-start:5px solid #2563eb;border-radius:10px;padding:12px 16px;color:#1e293b}
+.md-body.designed > ul:first-of-type{list-style:none;padding:0;margin:1.1em 0;border:1px solid #e6ebf2;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.md-body.designed > ul:first-of-type > li{padding:11px 15px;margin:0;border-top:1px solid #eef1f5;background:#fff}
+.md-body.designed > ul:first-of-type > li:first-child{border-top:0}
+.md-body.designed > ul:first-of-type > li > strong:first-child{display:inline-block;min-width:128px;color:#64748b;font-weight:700}
+.md-body.designed table{display:table;border:0;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06);font-size:13px}
+.md-body.designed th{background:#1e3a8a;color:#fff;border-color:#1e3a8a;white-space:nowrap}
+.md-body.designed td{border-color:#eceff3}
+.md-body.designed code{background:#eef2ff;color:#3730a3}
+.pill{display:inline-block;padding:0 8px;border-radius:999px;font-size:.9em;line-height:1.6;border:1px solid transparent;font-weight:600}
+.p-ok{background:#dcfce7;border-color:#bbf7d0}
+.p-warn{background:#fef9c3;border-color:#fde68a}
+.p-red{background:#fee2e2;border-color:#fecaca}
+.p-red2{background:#fecaca;border-color:#f87171}
+.p-cog{background:#e0e7ff;border-color:#c7d2fe}
+.p-todo{background:#f1f5f9;border-color:#e2e8f0}
+.chip-todo{display:inline-block;padding:0 6px;border-radius:6px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-size:.8em;font-weight:700;letter-spacing:.03em}
+@media(max-width:820px){.layout{flex-direction:column}.sidebar{width:100%;flex:none;height:auto;position:static;border-inline-end:0;border-bottom:1px solid #e5e7eb}.content{padding:16px}.md-body{padding:18px}.md-body.designed{padding:20px}}
+</style>
+</head>
+<body>
+<header class="top"><h1>אפיק 1 — SDD · ממשק קבצי MD</h1><div class="sub">תצוגת קבצי ה-Markdown של ריפו ה-SDD (epic1-gemel-sdd) · 22 קבצים · סנפשוט 2026-06-17</div></header>
+<section class="treewrap"><button class="treetoggle" id="treetoggle">🗂️ מבנה ה-Repo <span id="chev">▾</span></button><pre class="tree" id="tree"></pre></section>
+<nav class="tabs" id="tabs"></nav>
+<div class="layout">
+<aside class="sidebar"><input id="search" placeholder="חיפוש קובץ..."><div id="filelist"></div></aside>
+<main class="content">
+<div class="warn" id="warn">לא נטען marked (אולי אין אינטרנט) — מוצג טקסט גולמי.</div>
+<div class="toolbar"><div class="crumb" id="crumb"></div><div class="modes"><button class="mode" id="mDesigned">🎨 מעוצב</button><button class="mode" id="mMd">📄 MD</button></div></div>
+<article class="md-body" id="md"></article>
+</main>
+</div>
+<div id="store" hidden>
+<script type="text/plain" class="md" data-group="Root" data-title="CLAUDE.md" data-path="CLAUDE.md"># Epic 1 — Gemel Le'Hashkaa (Investment Provident Fund) · New Join Flow — SDD Repo
+
+This repository is the **Spec-Driven Development (SDD)** workspace for **Epic 1:
+onboarding a new, unidentified customer** (לקוח לא-מזוהה) to Migdal's investment
+provident fund (**קופת גמל להשקעה**). It is the source of truth that drives
+implementation by AI coding agents and human developers.
+
+The flow already exists in production; this is a **re-build in internal
+development** (replacing today's LPS configured-forms engine) — first at
+functional parity, on existing services only.
+
+## What's in here
+
+- **`Constitution/`** — the foundational, slow-changing context every agent reads first:
+  - `mission.md` — business context & product intent (the *what & why*). PRD-like.
+  - `tech-stack.md` — technical context: existing services, integration contracts,
+    architecture, NFRs. **Has known gaps — marked `TODO`.**
+  - `roadmap.md` — the build plan: capability areas → stories/specs, build waves, status.
+  - `principles.md` — non-negotiable governing principles for this epic.
+- **`Specs/`** — one folder per business user story (`NN-slug/`), each holding a
+  `requirements.md`. Most are **stubs** right now (title + source refs + `TODO`) —
+  to be filled one at a time, just-in-time.
+- **`CHANGELOG.md`** — living log of decisions & changes (a communication tool for
+  the team and for the agents that read it).
+
+## Source of truth
+
+All content here derives from the validated business+context doc:
+**`../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md`** (§-numbered). Each file cites the
+sections it was seeded from. When this repo and that doc disagree, reconcile
+deliberately and log it in `CHANGELOG.md`.
+
+## How we work (SDD conventions)
+
+- **The spec is the brain, the agent is the muscle.** A spec separates *what/why*
+  (`requirements`) from *how* (`plan`). Write the spec before the code.
+- **Architect, not foreman.** Humans supervise, verify, and decide; we don't dictate
+  line-by-line implementation. **Review every diff.**
+- **Small steps.** Build a thin **walking skeleton** first, then grow vertically.
+  One task group at a time; commit frequently.
+- **Fresh context per spec.** Start each spec with a clean agent context (`/clear`);
+  load the `Constitution/` + that one spec.
+- **Living documents.** The Constitution and specs are updated as we learn —
+  ideally on a separate branch, reviewed.
+- **Blocked = don't finalize.** Any item marked 🔴 (open question) must **not** be
+  turned into a final spec until the question is closed. See `Constitution/roadmap.md`
+  and the source doc §11.
+- **Don't invent the unknown.** Where a technical decision isn't known yet
+  (frameworks, environments, service schemas), it is marked `TODO` — leave it as a
+  hole until Digital/engineering provides it.
+- **Provenance discipline.** Distinguish ✅ confirmed · 🟡 assumption/to-verify ·
+  🔴 blocked · ⬜ placeholder/not-final.
+
+## Status — 2026-06-17
+
+Scaffold / infrastructure stage. Constitution seeded from the business doc (gaps
+marked). 14 spec folders created as stubs. Known-missing technical context (dev
+environments, full service schemas, frontend/backend stack) is flagged `TODO` in
+`Constitution/tech-stack.md` — **do not invent it**.
+
+## Language
+
+Repo files are in **English** for agent/dev consumption; **Hebrew product terms and
+labels are kept inline** where they are the real names (service names and screen
+labels, e.g. הרשאה לחיוב, היכרות פיננסית, קוד מוסד 602, מסלולי השקעה).
+</script>
+<script type="text/plain" class="md" data-group="Root" data-title="CHANGELOG.md" data-path="CHANGELOG.md"># Changelog
+
+A living log of significant decisions and changes to this SDD repo — newest first.
+This is a communication tool, for the team and for the AI agents that read it.
+
+> **How to use:** when a decision is made, a spec is filled, or the Constitution
+> changes, add a dated entry here (ideally in the same branch/PR as the change).
+
+## [Unreleased]
+
+### 2026-06-17 — Roadmap: added at-a-glance spec-map table
+- `Constitution/roadmap.md`: added a tabular **Spec map** (feature · Figma frame ·
+  spec · service · wave · blocked? · status) covering all 16 specs. Figma per-frame
+  deep-links left as `TODO`.
+
+### 2026-06-17 — Analytics split; added accessibility & Glassbox specs
+- `13-analytics-bo`: analytics now via **GTM + GA4** (open reference, `TODO`) + Back-Office reports.
+- Added cross-cutting **`15-accessibility`** (נגישות; standard TBD — IS 5568 ≈ WCAG 2.0 AA).
+- Added cross-cutting **`16-glassbox`** (session recording for replay / investigations /
+  funnel) — **split out of** `13`; PII/OTP masking to define.
+- Synced `Constitution/roadmap.md` + `tech-stack.md`. Spec count: 14 → **16**.
+
+### 2026-06-17 — Repo scaffold created
+- Established the SDD repo skeleton for **Epic 1 (unidentified customer)**.
+- Added **`Constitution/`** — `mission.md`, `tech-stack.md`, `roadmap.md`,
+  `principles.md` — seeded from the validated business doc
+  `אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md`.
+- Created **`Specs/`** with 14 story folders (`01-entry` … `14-aml-redpath`),
+  each a stub `requirements.md`.
+- **Conventions set:** English with Hebrew terms inline · `NN-slug` spec folders ·
+  gaps marked `TODO`/Open-Question (not invented).
+- **Open blockers carried from the doc (§11):** KYC "yes"/red-path & whether a
+  digital block exists (`14-aml-redpath`) · ceiling + management-fee data source,
+  under review by Rafi (`04`, `05`) · tracks slider/visual logic, needs product
+  (`05`) · OTP service/mechanism (`02`) · post-ID-upload view & errors (`09`).
+- **Known technical holes (do not invent):** frontend/backend stack, environments,
+  per-service request/response schemas, session/timeout, testing/CI — see
+  `Constitution/tech-stack.md`.
+</script>
+<script type="text/plain" class="md" data-group="Constitution" data-title="mission" data-path="Constitution/mission.md"># Mission — Epic 1: Unidentified-Customer Join Flow (קופת גמל להשקעה)
+
+## Overview
+
+Migdal's **Digital division** is rebuilding the online join flow for **קופת גמל
+להשקעה** (Investment Provident Fund — a liquid, tax-advantaged long-term savings
+product). The flow already exists in production; this is a **re-build in internal
+development** (replacing the current **LPS** configured-forms engine), not a new
+product.
+
+**Epic 1** delivers that same flow for a **new, unidentified customer**
+(לקוח לא-מזוהה), using **only services that exist in Digital today**. It is the
+modular base on which Epics 2–3 (identified customer / MDM; Ministry-of-Interior,
+automatic standing-order, UX) will be built.
+
+Why it matters strategically:
+
+1. **First SDD pilot in the organization** — prove fast, end-to-end
+   spec → implementation delivery (~3 weeks).
+2. **AI Product Managers in the loop** — PMs co-produce the specs and context that
+   drive the build.
+
+## The problem
+
+Today's digital join runs on **LPS** — configured forms that emit a "form" the
+back office then processes. It is not real screen development: no control over UX,
+no foundation to extend. To enable the digital vision (and later grow digital's
+share of joins), the flow must be rebuilt in internal development — first at
+**functional parity**, on existing services only.
+
+## Goals & outcomes
+
+- **Functional parity** with the existing flow, in our own development.
+- Improved **UI/UX**.
+- A **modular base** for Epics 2–3.
+- **Compliance** (KYC/AML, tax residency) as it exists today.
+
+Outcome: full reproduction of current functionality in internal development, and a
+measurable baseline for future conversion.
+
+**Top business KPI (context):** grow the **digital share of joins** (today ~**8%**)
+— not total growth. On-time delivery (~3 weeks) as proof of SDD capability.
+
+## Personas
+
+- **New unidentified customer (adult, for self):** joins with no login or history;
+  enters all details manually; wants a fast, clear process.
+- **Unidentified parent (for their child):** the **parent is the depositor**,
+  acting as **guardian (אפוטרופוס)** for the child (the saver); enters the child's
+  details alongside their own.
+- **Existing customer (with or without an existing fund) — still unidentified:**
+  may join, but receives the **same generic flow** as any unidentified customer.
+  No special handling in Epic 1.
+
+## Scope
+
+**In Epic 1:** unidentified customer (adult for self, or parent for child) ·
+**OTP** mobile verification · full manual data entry · tax-residency declaration
+(checkbox) · annual-ceiling display + track selection (up to 6) · **KYC for all**
+(data collection) · payment: **bank transfer** (one-time) and **debit
+authorization the customer sets up at their own bank** (monthly) · ID-photo upload
+· back-office emission as today (Glikson / XML / Sigal / Noga / IMAGE) · analytics
+& leads (Glassbox / Salesforce). **Existing services only.**
+
+**Out of Epic 1:**
+- ❌ **Ministry-of-Interior** (משרד הפנים) verification → Epic 3.
+- ❌ **Automatic standing-order** (הו"ק) from within the flow → Epic 3.
+- ❌ **MDM** / existing-customer identification → Epic 2.
+- ❌ **Digital signature** — not part of this flow.
+
+## Business assumptions (source §8)
+
+- Product: liquid, tax-advantaged provident fund.
+- Annual ceiling ≈ **83,641 ₪** per calendar year; for an unidentified customer —
+  only by what they enter (no history). *Data source: `TODO` 🔴 — see `tech-stack.md`.*
+- Customer types: unidentified adult (self) · parent as guardian (for child).
+- OTP required — for **mobile verification** (not login / not identification).
+- KYC for all; data collection only. "Yes"-branches beyond business-owner are 🔴 open.
+- Tax residency = **mandatory checkbox** (no full FATCA/CRS questionnaire).
+- Payment: one-time = bank transfer + reference (אסמכתא); monthly = debit
+  authorization (הרשאה לחיוב) the customer sets up at their own bank
+  (**קוד מוסד 602**).
+- **No digital signature.**
+- Fund number assigned only at completion (not shown to the customer until the fund
+  is actually created).
+- Glassbox analytics + Salesforce lead on abandonment — existing, in scope.
+
+## Success metrics
+
+- Full functional parity with the existing flow, in internal development.
+- On-time delivery (~3 weeks) as SDD proof.
+- A measurable baseline for future conversion (digital share > ~8%).
+
+## Open questions (business) — do not finalize dependent specs
+
+Carried from source doc **§11**. Key blockers:
+- KYC **"yes" / red-path** handling, and whether a **digital block** exists at all.
+- Ceiling + management-fee **data source** (under review by Rafi).
+- Tracks **slider / visual logic** (needs product definition).
+- **OTP** service / mechanism.
+- **Post-ID-upload** view & error handling.
+
+*(Full detail lives in the source doc; build status in `roadmap.md`.)*
+
+---
+*Source: `../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` (§1–5, §8, §11). Seeded 2026-06-17; gaps marked `TODO`.*
+</script>
+<script type="text/plain" class="md" data-group="Constitution" data-title="tech-stack" data-path="Constitution/tech-stack.md"># Tech Stack & Integration Context — Epic 1
+
+> **Status: partial.** This file captures what we **know today** from the
+> business/context doc. Several core technical decisions are **not yet known** and
+> are marked `TODO` 🔴 — **do not invent them**; they must come from
+> Digital / engineering.
+
+## Architecture — known constraints
+
+- **Internal development** replacing the current **LPS** (configured-forms) engine —
+  full control of screens & UX.
+- **Existing services only** (Epic 1). The service catalog below is the scope boundary.
+- **Back office unchanged:** the outbound contract to the back office
+  (Glikson → existing XML service → **Sigal**; daily **Noga** interface 17:00 Sun–Thu;
+  document filing to **IMAGE**) is **identical to today** — we do not change the
+  outgoing form / XML.
+- **Modular base** for Epics 2–3 — do not hard-wire Epic-1-only assumptions.
+
+## TODO 🔴 — core technical decisions not yet known (do not invent)
+
+- **Frontend framework / stack** for the new screens. `TODO`
+- **Backend / orchestration platform** hosting the flow. `TODO`
+- **Auth / OTP mechanism** — no dedicated OTP service exists in the catalog; the
+  send + verify mechanism and the email fallback are unknown. `TODO 🔴 (SS-OTP)`
+- **Ceiling & management-fee data source** — today from LPS tables (edited ~annually);
+  a service to provide them is **under review by Rafi**. `TODO 🔴 (SS-RULES)`
+- **Per-service request/response schemas** (contracts) for every service below. `TODO`
+- **Environments** (dev / test / staging / prod), configuration, secrets. `TODO`
+- **Persistence** for in-flight drafts / session, and **session timeout**
+  (the doc shows a 20-vs-30-minute inconsistency). `TODO`
+- **Testing / CI** approach. `TODO`
+
+## Existing services — catalog & contract stubs (scope boundary)
+
+> Stage / purpose mapping is **inferred (🟡)** — verify with Digital before fixing a
+> contract. Each service is a candidate **Contract-Spec**; I/O schemas are `TODO`.
+
+| Service | Purpose | Used by (spec) | Notes |
+|---|---|---|---|
+| `SRV_GeneralData` | Addresses (city/street/postal) | `03-saver-and-details` | autocomplete |
+| `BankAndBranchesService` | Banks / branches | `08-bank-and-payment` | dropdown |
+| `GetCountries` | Countries | `03` (tax residency), `06`–`07` (KYC abroad) | |
+| `ReceivingFormCheckService` | Know-Your-Customer (RAM) | `06`, `07`, `14` | **collection only** in Epic 1; live check 🔴 (see `14-aml-redpath`) |
+| `SRV_Documents /api/GetAnnualCost` | Expected annual cost | `04-amount-ceiling`, `10-summary-success` | relation to ceiling source TBD 🔴 |
+| `ENTImmediatePaymentsAPI` | מס"ב payments | `08-bank-and-payment` | role in Epic 1 uncertain 🟡 |
+| `EnterpriseDistributionService` | Email / SMS / letters | `10-summary-success`, notifications | |
+| `OrderDocumentService` | Letters & forms | `10-summary-success` (declarations doc) | |
+| `MigdalFormsReqProcessing` | Transaction intake | `11-backend-emit` | to back office |
+| `ImageServiceApi` | Filing to IMAGE | `09-id-upload`, `11-backend-emit` | |
+| `CreateServiceCallService` | Sales leads | `01-entry` ("call me back"), `12-draft-and-lead` (abandonment) | → Salesforce |
+| `SRV_OTP` *(does not exist)* | OTP send / verify | `02-identify-otp` | **🔴 no such service** — mechanism TBD |
+
+## Non-functional requirements (source §10)
+
+- **Availability + fallback** for the existing interfaces.
+- **Accessibility** (standard — likely IS 5568 ≈ WCAG 2.0 AA, to confirm) → spec `15-accessibility`.
+- **Security & privacy:** PII, OTP, uploaded documents.
+- **Draft / progress save** for X days (duration `TODO` / 🟡).
+- **Analytics:** **GTM + GA4** tag-based events (open / `TODO`) → `13-analytics-bo` ·
+  **Glassbox** session recording (steps, errors, Ajax) → `16-glassbox` ·
+  **Salesforce** leads → `12-draft-and-lead`.
+- **No change** to the back-office output — full parity with the existing flow.
+
+---
+*Source: `../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` (§9, §10, §6). Seeded 2026-06-17; technical gaps marked `TODO` — not invented.*
+</script>
+<script type="text/plain" class="md" data-group="Constitution" data-title="roadmap" data-path="Constitution/roadmap.md"># Roadmap — Epic 1
+
+> Living document. Build a **thin walking skeleton first**, then grow vertically.
+> Each spec is the translation of one business user story.
+> **Do not finalize a spec marked 🔴 until its open question is closed.**
+
+## Spec map (at a glance)
+
+> **Figma file:** `zVX5Kk776enOYqwlBy1SqT` — "קופת גמל להשקעה- פרטי שלי" (pages: `mobile`, desktop).
+> The **Figma frame** column references the board screen(s); exact per-frame deep-links are
+> `TODO` — can be auto-filled via the Figma MCP.
+> **Wave:** A = build now · B = story now / contract stub · C = blocked on a decision · ⚙️ = cross-cutting.
+> **אפיון (status):** ✅ characterized · 🟡 partial · 🔴 not characterized.
+
+| # | Feature | Figma frame | Spec | Service(s) | Wave | Blocked? | אפיון |
+|---|---|---|---|---|---|---|---|
+| 01 | Entry (multi-entry) | Landing (0) | `01-entry` | `CreateServiceCallService` | A | — | 🟡 |
+| 02 | Mobile verification (OTP) | 1, 1b | `02-identify-otp` | `SS-OTP` (none) | B | 🔴 OTP mechanism | 🔴 |
+| 03 | Choose saver & details | 2, 3 | `03-saver-and-details` | `SRV_GeneralData`, `GetCountries` | A | — | 🟡 |
+| 04 | Amount vs ceiling | 4 | `04-amount-ceiling` | `GetAnnualCost` / ceiling | B | 🔴 source (Rafi) | 🟡 logic ✅ |
+| 05 | Track selection | 5 | `05-tracks` | fees (as 04) | C | 🔴 slider (product) | 🔴 |
+| 06 | KYC questionnaire | 7 | `06-kyc-questionnaire` | `ReceivingFormCheckService` | A | — | ✅ |
+| 07 | Business-owner branch | 8, 9 | `07-kyc-business` | `GetCountries` / RAM | A | — | ✅ |
+| 08 | Bank & payment routing | 11–13 | `08-bank-and-payment` | `BankAndBranchesService` (+מס"ב 🟡) | A | — | 🟡 |
+| 09 | ID photo upload | 14 | `09-id-upload` | `ImageServiceApi` | A | 🔴 post-upload view | 🟡 |
+| 10 | Summary & success | 15, 16 | `10-summary-success` | `OrderDocumentService`, `EnterpriseDistributionService` | A | — | 🟡 ⬜ |
+| 11 | Back-office emission ⚙️ | — | `11-backend-emit` | Glikson→XML→Sigal · Noga · IMAGE | ⚙️ | 🟡 dep. `14` | 🟡 parity |
+| 12 | Draft save & lead ⚙️ | — | `12-draft-and-lead` | `CreateServiceCallService` + session | ⚙️ | — | 🟡 |
+| 13 | Analytics & BO reports ⚙️ | — | `13-analytics-bo` | GTM + GA4 (open) + BO | ⚙️ | — | 🟡 |
+| 14 | AML "yes" / red-path | 6–10 | `14-aml-redpath` | `ReceivingFormCheckService` (RAM) | C | 🔴🔴 undefined | 🔴🔴 |
+| 15 | Accessibility ⚙️ | all screens | `15-accessibility` | — (standard) | ⚙️ | — | 🟡 TBD |
+| 16 | Glassbox recording ⚙️ | all screens | `16-glassbox` | `Glassbox` | ⚙️ | — | 🟡 |
+
+## Capability areas → specs
+
+One line per spec. Full mapping (screens, service, status) is in the source doc §12.
+
+**🟦 Entry & identity**
+- `01-entry` — Enter the flow (marketing site + personal area / app); option to
+  request a callback. 🟡 personal-area entry to verify.
+- `02-identify-otp` — Capture minimal details + **OTP** mobile verification
+  (+ email fallback). 🔴 OTP mechanism.
+- `03-saver-and-details` — Choose the saver (self / child) + tax-residency
+  declaration + address & gender. (`V-MINOR` variant attaches here.)
+
+**🟩 Amount & tracks**
+- `04-amount-ceiling` — Choose deposit (one-time / monthly / both) vs the annual
+  ceiling; dynamic max logic ✅. 🔴 ceiling + fees source (Rafi).
+- `05-tracks` — Select investment tracks (up to 6, summing to 100%) + fees.
+  🔴 slider / visual logic (product).
+
+**🟨 Financial acquaintance (KYC / AML)**
+- `06-kyc-questionnaire` — KYC screening questionnaire; collection for all. ✅
+- `07-kyc-business` — Business-owner branch: business field + source of funds. ✅
+- `14-aml-redpath` — Handling of "yes" answers / red-path, and whether a digital
+  block exists. 🔴🔴 not yet characterized — the central blocker.
+
+**🟪 Payment, documents & closing**
+- `08-bank-and-payment` — Bank account + payment routing by frequency
+  (602 / transfer + reference / both). 🟡 מס"ב role.
+- `09-id-upload` — Upload ID photo (front / back; parent ספח for a minor).
+  🔴 post-upload view / errors.
+- `10-summary-success` — Summary + 3 checkboxes (submit gating) + success + fund number.
+
+**⚙️ Cross-cutting / back office**
+- `11-backend-emit` — Back-office emission (Glikson→XML→Sigal, Noga, IMAGE). Parity,
+  unchanged. 🟡 depends on the red-path decision.
+- `12-draft-and-lead` — Draft / session save + abandonment lead to Salesforce.
+  🟡 session duration.
+- `13-analytics-bo` — Analytics via **GTM + GA4** (open) + Back-Office reports.
+  🟡 GTM/GA4 plan + BO reports to define.
+- `15-accessibility` — Accessibility (נגישות) across all screens; standard TBD
+  (IS 5568 ≈ WCAG 2.0 AA). 🟡
+- `16-glassbox` — Glassbox session recording (replay, investigations, funnel
+  analytics). 🟡 PII/OTP masking to define.
+
+## Build waves (delivery order)
+
+- **Wave A — build now (full story):** `01`, `03`, `06`, `07`, `08`, `10`
+  · plus `09` (only the post-upload view is open).
+- **Wave B — story now, service contract as a stub:** `02` (`SS-OTP` 🔴),
+  `04` (`SS-RULES` 🔴).
+- **Wave C — blocked on a decision (don't spec yet):** `05` (slider — product),
+  `14` (red-path — business).
+- **Cross-cutting (alongside):** `11`, `12`, `13`, `15`, `16` — parity-oriented;
+  finalize `11` after the red-path call.
+
+## Suggested walking skeleton
+
+A thin end-to-end path first:
+`01-entry → 03-saver-and-details → 04-amount-ceiling → 10-summary-success →
+11-backend-emit` (with stubbed services), then grow KYC, payment, tracks, and uploads.
+
+---
+*Source: `../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` (§12, §7). Seeded 2026-06-17.*
+</script>
+<script type="text/plain" class="md" data-group="Constitution" data-title="principles" data-path="Constitution/principles.md"># Principles — Epic 1 (the Constitution's non-negotiables)
+
+> Governing principles for every spec and every implementation in this epic,
+> derived from the source doc **§6**. If a spec or a piece of code conflicts with
+> these, the principle wins — or the principle is changed **deliberately** and
+> logged in `CHANGELOG.md`.
+
+1. **Identity-lite.** The customer is unidentified. No login, no external data pull.
+   OTP is for **mobile verification only** — not identification, not login.
+2. **Parity-first.** Epic 1 reproduces the existing behavior in internal
+   development. Whatever is not known with certainty defaults to **parity with the
+   existing flow**, not invention.
+3. **Existing services only.** The scope boundary is the service catalog in
+   `tech-stack.md`. No new service in Epic 1.
+4. **Compliance by design.** The tax-residency declaration and KYC/AML data
+   collection are built into the flow, even where some branches are still open.
+5. **Single source of truth for rules.** Ceiling, management fees, track types, and
+   KYC rules come from **one defined source** — not scattered across UI logic.
+6. **Modular internal development.** Structure the build so Epics 2–3 can be added
+   without a rewrite.
+7. **Explicit interface contracts.** Every existing service has a defined
+   input / output contract (a Contract-Spec).
+8. **Back office unchanged.** Output to the back office (Glikson→XML→Sigal, Noga,
+   IMAGE) is **identical to today** — do not change the outgoing contract.
+9. **No digital signature** in Epic 1.
+10. **Accessibility + analytics** (Glassbox, Salesforce leads) are part of the NFR
+    baseline.
+
+---
+*Source: `../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` (§6). Seeded 2026-06-17.*
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="01 · entry" data-path="Specs/01-entry/requirements.md"># 01 · Entry to the Join Flow (Multi-entry) (כניסה לתהליך ההצטרפות)
+
+> **Status:** 🟡 partial. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Enter the flow from the marketing site or the personal area / app; option to request a callback.
+- **Screens (board):** 0 (marketing landing)
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.0, §12 #1
+- **Service(s):** `CreateServiceCallService` (callback — "שיחזרו אלי") 🟡
+- **Blocked by:** 🟡 personal-area / app entry not in source — verify
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="02 · identify-otp" data-path="Specs/02-identify-otp/requirements.md"># 02 · Mobile Verification (OTP) (אימות מספר נייד (OTP))
+
+> **Status:** 🔴 blocked. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Capture name, ID and mobile; send and verify an SMS OTP (email fallback). OTP = mobile verification only, not login.
+- **Screens (board):** 1, 1b
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.1, §12 #2
+- **Service(s):** `SS-OTP` — no such service in the catalog 🔴
+- **Blocked by:** 🔴 OTP service / mechanism unknown (SS-OTP)
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="03 · saver-and-details" data-path="Specs/03-saver-and-details/requirements.md"># 03 · Choose Saver & Personal Details (בחירת החוסך והשלמת פרטים אישיים)
+
+> **Status:** 🟡 partial. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Choose for whom (self / child) + mandatory tax-residency declaration; enter address & gender. The child path opens the child's details (parent acts as guardian).
+- **Screens (board):** 2, 3
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.2–7.3, §12 #3
+- **Service(s):** `SRV_GeneralData` (addresses), `GetCountries` (residency) 🟡
+- **Blocked by:** 🟡 required address fields to verify · `V-MINOR` (minor) variant attaches here
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="04 · amount-ceiling" data-path="Specs/04-amount-ceiling/requirements.md"># 04 · Deposit Amount vs Annual Ceiling (בחירת סכום הפקדה מול תקרה)
+
+> **Status:** 🔴 blocked (data source) — max logic ✅. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Choose one-time / monthly / both vs the annual ceiling. Max logic: one-time max = ceiling; monthly max = (ceiling − one-time) / 12.
+- **Screens (board):** 4
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.4, §12 #4
+- **Service(s):** `SRV_Documents/GetAnnualCost` / ceiling service 🔴
+- **Blocked by:** 🔴 ceiling + management-fee data source (under review by Rafi)
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="05 · tracks" data-path="Specs/05-tracks/requirements.md"># 05 · Investment Track Selection (בחירת מסלולי השקעה והקצאה)
+
+> **Status:** 🔴 blocked (product). **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Select up to 6 investment tracks summing to 100%; show management fees.
+- **Screens (board):** 5
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.5, §12 #5
+- **Service(s):** management-fee source (same as `04`) 🔴
+- **Blocked by:** 🔴 slider / visual logic & states — needs product definition
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="06 · kyc-questionnaire" data-path="Specs/06-kyc-questionnaire/requirements.md"># 06 · KYC Screening Questionnaire (שאלון היכרות פיננסית (KYC))
+
+> **Status:** ✅ characterized. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Yes / no KYC questions + income level; data collection for all customers, no live service check.
+- **Screens (board):** 7
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.6, §12 #6
+- **Service(s):** `ReceivingFormCheckService` (RAM — collection only) 🟡
+- **Blocked by:** —
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="07 · kyc-business" data-path="Specs/07-kyc-business/requirements.md"># 07 · Business-Owner Branch (ענף בעל-עסק — תחום עסק ומקור כספים)
+
+> **Status:** ✅ characterized. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** If the customer is a business owner: collect business field (תחום עסק) + source of funds (מקור הכספים).
+- **Screens (board):** 8, 9
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.6, §12 #7
+- **Service(s):** `GetCountries`, `ReceivingFormCheckService` 🟡
+- **Blocked by:** —
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="08 · bank-and-payment" data-path="Specs/08-bank-and-payment/requirements.md"># 08 · Bank Account & Payment Routing (פרטי חשבון בנק וניתוב תשלום)
+
+> **Status:** 🟡 partial — routing ✅. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Enter bank details; route by frequency — monthly → customer sets up a debit authorization (הרשאה לחיוב) at their own bank (קוד מוסד 602); one-time → bank transfer + reference (אסמכתא); both → both paths.
+- **Screens (board):** 11–13
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.7, §12 #8
+- **Service(s):** `BankAndBranchesService` (+ `ENTImmediatePaymentsAPI` 🟡)
+- **Blocked by:** 🟡 role of `ENTImmediatePaymentsAPI` (מס"ב) uncertain
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="09 · id-upload" data-path="Specs/09-id-upload/requirements.md"># 09 · ID Photo Upload (העלאת צילום תעודת זהות)
+
+> **Status:** 🔴 partial — post-upload view open. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Upload ID photo front & back (old ID — front only); a minor also adds the parent's ספח.
+- **Screens (board):** 14
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.8, §12 #9
+- **Service(s):** `ImageServiceApi` 🟡
+- **Blocked by:** 🔴 post-upload view & error handling undefined
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="10 · summary-success" data-path="Specs/10-summary-success/requirements.md"># 10 · Summary, Confirmation & Success (סיכום, אישור והשלמת הבקשה)
+
+> **Status:** 🟡 partial — gating ✅, some placeholder text. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Show summary + 3 checkboxes (2 mandatory gate the submit; 1 optional marketing) → success screen with fund number. No digital signature.
+- **Screens (board):** 15, 16
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.9–7.10, §12 #10
+- **Service(s):** `OrderDocumentService`, `EnterpriseDistributionService` 🟡
+- **Blocked by:** ⬜ some design text is placeholder (not final)
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="11 · backend-emit" data-path="Specs/11-backend-emit/requirements.md"># 11 · Back-Office Emission (שידור עורפי וקליטה לעורף)
+
+> **Status:** 🟡 parity — depends on red-path. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Emit to the back office identically to today (Glikson → XML → Sigal; Noga 17:00 Sun–Thu; filing to IMAGE). Do not change the outgoing contract.
+- **Screens (board):** — (behind the scenes)
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.11, §12 #11
+- **Service(s):** Glikson→XML→Sigal · `MigdalFormsReqProcessing` · Noga interface 🟡
+- **Blocked by:** 🟡 hold / created behavior depends on `14-aml-redpath`
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="12 · draft-and-lead" data-path="Specs/12-draft-and-lead/requirements.md"># 12 · Draft Save & Abandonment Lead (שמירת טיוטה והפניית ליד (נטישה))
+
+> **Status:** 🟡 partial. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Save the in-flight draft / session; on abandonment, create a Salesforce lead.
+- **Screens (board):** — (cross-cutting)
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §10, §12 #12
+- **Service(s):** `CreateServiceCallService` (→ Salesforce) + session save 🟡
+- **Blocked by:** 🟡 session duration (20 vs 30 min) to verify
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="13 · analytics-bo" data-path="Specs/13-analytics-bo/requirements.md"># 13 · Analytics & Back-Office Reports (מדידה (Analytics) ודוחות Back-Office)
+
+> **Status:** 🟡 partial. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Emit step/event analytics across the flow via **GTM + GA4** (tag-based, quantitative), and feed **Back-Office reports** per Digital's overall requirement. (Glassbox session-recording is a separate spec — see `16-glassbox`.)
+- **Screens (board):** — (cross-cutting / NFR)
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §10, §12 #13
+- **Service(s):** **GTM** (Google Tag Manager) + **GA4** (Google Analytics 4) — open / `TODO` · BO reporting layer 🟡
+- **Blocked by:** 🟡 GTM/GA4 plan (event taxonomy, dataLayer, consent) to define · BO-reports requirement to define with Digital
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above. **GTM/GA4 are an open reference for now:**
+the exact event taxonomy, dataLayer structure, and consent handling are not yet decided.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO — session recording / replay (covered by `16-glassbox`).
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="14 · aml-redpath" data-path="Specs/14-aml-redpath/requirements.md"># 14 · AML "Yes" Handling / Red Path (טיפול בתשובות "כן" / מסלול אדום (AML))
+
+> **Status:** 🔴🔴 not characterized — central blocker. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Define what happens on "yes" answers (PEP, foreign deposits, income abroad, financial-institution rejection for AML), and whether a digital block / hold exists.
+- **Screens (board):** 6–10
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §7.6, §7.11, §11 (#1–2), §12 #14
+- **Service(s):** `ReceivingFormCheckService` (RAM) 🔴
+- **Blocked by:** 🔴🔴 undefined — must be decided before any spec is written
+
+## Goal
+TODO
+
+## Context
+TODO — seed from the source sections above.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="15 · accessibility" data-path="Specs/15-accessibility/requirements.md"># 15 · Accessibility (התאמות נגישות) — cross-cutting ⚙️
+
+> **Status:** 🟡 partial. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Ensure the entire join flow meets the required **accessibility standard**
+  across all screens — keyboard navigation, screen-reader support, color contrast,
+  focus order, and accessible error messages.
+- **Screens (board):** — (cross-cutting / all screens)
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §10 (NFR), §6 #10
+- **Service(s):** — (standards-based; no service)
+- **Blocked by:** 🟡 exact standard & level to confirm (likely Israeli Standard **IS 5568** ≈ **WCAG 2.0 AA**) — `TODO`
+
+## Goal
+TODO
+
+## Context
+TODO — Israeli accessibility regulation typically requires **IS 5568** (≈ WCAG 2.0
+level AA). Confirm the binding level and scope with Digital before fixing acceptance
+criteria. Applies to every screen in the flow.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO
+
+## Acceptance criteria
+TODO — e.g. automated a11y checks pass + a manual screen-reader / keyboard pass per screen.
+</script>
+<script type="text/plain" class="md" data-group="Specs" data-title="16 · glassbox" data-path="Specs/16-glassbox/requirements.md"># 16 · Glassbox — Session Recording (הקלטת סשנים) — cross-cutting ⚙️
+
+> **Status:** 🟡 partial. **Stub — not yet specified.** Fill just-in-time per
+> `../../Constitution/roadmap.md`. Do not finalize a spec while it is blocked (🔴).
+
+- **Story:** Integrate **Glassbox** session recording across the flow — capturing
+  customer sessions for replay, investigations (תחקורים), and funnel analytics.
+  Capture step parameters, Visual Name, red errors, and Ajax (per source §T4).
+- **Screens (board):** — (cross-cutting / all screens)
+- **Source:** `../../../אפיק 1 — דרישה וקונטקסט מלא (ל-SDD).md` §10 (NFR), §9.2 (T4); split from `13-analytics-bo`
+- **Service(s):** **Glassbox** (session-recording SDK / integration) 🟡
+- **Blocked by:** 🟡 integration details + **PII / OTP masking** policy to define — `TODO`
+
+## Goal
+TODO
+
+## Context
+TODO — Glassbox = qualitative session replay + funnel analytics, complementary to the
+quantitative GTM/GA4 events in `13-analytics-bo`. Must **mask sensitive fields**
+(PII, OTP, uploaded documents) per the security NFR.
+
+## Scope (decisions)
+TODO
+
+## Out of scope
+TODO — tag-based event analytics / GA4 (covered by `13-analytics-bo`).
+
+## Acceptance criteria
+TODO
+</script>
+</div>
+<script>
+(function(){
+  var ok=!!(window.marked);
+  if(ok&&window.marked.setOptions){marked.setOptions({gfm:true,breaks:false,headerIds:false,mangle:false});}
+  if(!ok){var w=document.getElementById('warn');if(w)w.style.display='block';}
+  var blocks=[].slice.call(document.querySelectorAll('#store script.md')).map(function(s){
+    return {group:s.getAttribute('data-group'),title:s.getAttribute('data-title'),path:s.getAttribute('data-path'),text:s.textContent};
+  });
+  var groups=[{key:'Root',label:'שורש · Root'},{key:'Constitution',label:'חוקה · Constitution'},{key:'Specs',label:'ספקים · Specs'}];
+  var state={group:'Root',path:blocks.length?blocks[0].path:null,q:'',mode:'designed'};
+  var tabsEl=document.getElementById('tabs'),listEl=document.getElementById('filelist'),mdEl=document.getElementById('md'),crumbEl=document.getElementById('crumb'),searchEl=document.getElementById('search');
+  function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function md2html(t){try{if(window.marked)return marked.parse?marked.parse(t):marked(t);}catch(e){}return '<pre class="raw">'+esc(t)+'</pre>';}
+  function byPath(p){for(var i=0;i<blocks.length;i++)if(blocks[i].path===p)return blocks[i];return null;}
+  function leaf(b){var n=b.path;if(b.group==='Constitution')n=b.path.replace('Constitution/','');else if(b.group==='Specs')n=b.path.replace('Specs/','');return '<a class="tl" data-path="'+b.path+'">'+n+'</a>';}
+  function buildTree(){var root=blocks.filter(function(b){return b.group==='Root';}),cons=blocks.filter(function(b){return b.group==='Constitution';}),spec=blocks.filter(function(b){return b.group==='Specs';});var L=[];L.push('<span class="dir">epic1-gemel-sdd/</span>');root.forEach(function(b){L.push('├── '+leaf(b));});L.push('├── <span class="dir">Constitution/</span>');cons.forEach(function(b,i){L.push('│   '+(i===cons.length-1?'└── ':'├── ')+leaf(b));});L.push('└── <span class="dir">Specs/</span>');spec.forEach(function(b,i){L.push('    '+(i===spec.length-1?'└── ':'├── ')+leaf(b));});document.getElementById('tree').innerHTML=L.join('\n');}
+  function enhance(el){var h=el.innerHTML;h=h.replace(/🔴🔴/g,'@@R2@@').replace(/🔴/g,'<span class="pill p-red">🔴</span>').replace(/@@R2@@/g,'<span class="pill p-red2">🔴🔴</span>').replace(/✅/g,'<span class="pill p-ok">✅</span>').replace(/🟡/g,'<span class="pill p-warn">🟡</span>').replace(/⚙️/g,'<span class="pill p-cog">⚙️</span>').replace(/⬜/g,'<span class="pill p-todo">⬜</span>').replace(/\bTODO\b/g,'<span class="chip-todo">TODO</span>');el.innerHTML=h;}
+  function tabs(){tabsEl.innerHTML='';groups.forEach(function(g){var cnt=blocks.filter(function(b){return b.group===g.key;}).length;var btn=document.createElement('button');btn.className='tab'+(state.group===g.key?' active':'');btn.innerHTML=g.label+' <span class="cnt">'+cnt+'</span>';btn.onclick=function(){state.group=g.key;state.q='';searchEl.value='';var f=blocks.filter(function(b){return b.group===g.key;})[0];state.path=f?f.path:null;all();};tabsEl.appendChild(btn);});}
+  function list(){listEl.innerHTML='';var q=state.q.toLowerCase();var items=blocks.filter(function(b){return b.group===state.group&&(!q||(b.title+' '+b.path).toLowerCase().indexOf(q)>=0);});if(!items.length){listEl.innerHTML='<div class="empty">אין תוצאות</div>';return;}items.forEach(function(b){var a=document.createElement('button');a.className='file'+(state.path===b.path?' active':'');a.innerHTML='<span class="ft">'+esc(b.title)+'</span><span class="fp">'+esc(b.path)+'</span>';a.onclick=function(){state.path=b.path;content();list();};listEl.appendChild(a);});}
+  function modesUI(){document.getElementById('mDesigned').className='mode'+(state.mode==='designed'?' active':'');document.getElementById('mMd').className='mode'+(state.mode==='md'?' active':'');}
+  function content(){var b=byPath(state.path);if(!b){mdEl.innerHTML='';crumbEl.textContent='';return;}crumbEl.textContent=b.path;mdEl.className='md-body'+(state.mode==='designed'?' designed':'');mdEl.innerHTML=md2html(b.text);if(state.mode==='designed')enhance(mdEl);modesUI();}
+  function navigate(p){var b=byPath(p);if(!b)return;state.group=b.group;state.path=p;all();window.scrollTo({top:0,behavior:'smooth'});}
+  function all(){tabs();list();content();}
+  searchEl.oninput=function(){state.q=searchEl.value;list();};
+  document.getElementById('mDesigned').onclick=function(){state.mode='designed';content();};
+  document.getElementById('mMd').onclick=function(){state.mode='md';content();};
+  document.getElementById('treetoggle').onclick=function(){var t=document.getElementById('tree');t.classList.toggle('collapsed');document.getElementById('chev').textContent=t.classList.contains('collapsed')?'▸':'▾';};
+  document.getElementById('tree').addEventListener('click',function(e){var a=e.target.closest('a.tl');if(a){e.preventDefault();navigate(a.getAttribute('data-path'));}});
+  buildTree();all();
+})();
+</script>
+</body>
+</html>
